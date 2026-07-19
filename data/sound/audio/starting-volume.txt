@@ -1,0 +1,16 @@
+ambiance
+1
+ambiancelayer
+1
+oneshot
+1
+song
+0.85
+alignmentambiance
+1
+soundeffects
+1
+userinterface
+1
+notification
+1
