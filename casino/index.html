@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gold &amp; Jade Casino</title>
+<meta name="description" content="Seven classic casino games played with virtual chips only. No real money.">
+<meta name="theme-color" content="#06140f">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@400;500;600;700;800&family=Limelight&family=ZCOOL+QingKe+HuangYou&display=swap">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <a class="brand" href="#lobby" aria-label="Lobby">
+      <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="18" fill="url(#bm)" stroke="#6b4400" stroke-width="1.5"/><circle cx="20" cy="20" r="12.5" fill="none" stroke="#fff3b0" stroke-width="1" stroke-dasharray="2 2"/><rect x="15.5" y="15.5" width="9" height="9" fill="#0c2b21" stroke="#fff3b0" stroke-width="1"/><defs><linearGradient id="bm" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff2b0"/><stop offset=".5" stop-color="#f3c14a"/><stop offset="1" stop-color="#a86e14"/></linearGradient></defs></svg></span>
+      <span class="brand-name" data-i18n="brand">金玉满堂</span>
+    </a>
+    <div class="level" title="Level">
+      <span class="lvl-lab">Lv</span><b id="lvl-num">1</b>
+      <span class="lvl-track"><span id="lvl-bar"></span></span>
+    </div>
+    <div class="top-right">
+      <button id="refill" class="btn btn-gold btn-sm refill" hidden>+10,000</button>
+      <div id="balance" class="balance" aria-live="polite">
+        <span class="coin-ico" aria-hidden="true"></span>
+        <b id="bal-num">10,000</b>
+      </div>
+      <button id="btn-lang" class="icon-btn txt" aria-label="Language">EN</button>
+      <button id="btn-sound" class="icon-btn" aria-label="Sound"></button>
+      <button id="btn-settings" class="icon-btn" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg></button>
+    </div>
+  </header>
+  <main id="views">
+    <section class="view lobby" data-view="lobby"></section>
+  </main>
+</div>
+<div id="flash" aria-hidden="true"></div>
+<div id="toasts" aria-live="polite"></div>
+<div id="bigwin" class="bigwin" hidden>
+  <div class="bw-rays" aria-hidden="true"></div>
+  <div class="bw-inner"><div class="bw-title"></div><div class="bw-amt">0</div><div class="bw-tap"></div></div>
+</div>
+
+<script src="js/util.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/fx.js"></script>
+<script src="js/core.js"></script>
+<script src="js/games/slots-math.js"></script>
+<script src="js/games/slots.js"></script>
+<script src="js/games/blackjack.js"></script>
+<script src="js/games/roulette.js"></script>
+<script src="js/games/baccarat.js"></script>
+<script src="js/games/sicbo.js"></script>
+<script src="js/games/crash.js"></script>
+<script src="js/games/plinko.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
