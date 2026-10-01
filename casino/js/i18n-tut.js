@@ -91,7 +91,7 @@
       <tr><td>轮盘</td><td>97.3%</td><td>所有押法一样，只是波动不同</td></tr>
       <tr><td>骰宝</td><td>97.2%</td><td>押大小；单点围骰返还率低很多</td></tr>
       <tr><td>老虎机</td><td>≈ 95%</td><td>下注大小不影响返还率，只影响波动</td></tr>
-      <tr><td>棋牌室</td><td>不抽水</td><td>筹码只在玩家之间流动，靠技术和心理</td></tr></table>
+      <tr><td>棋牌室</td><td>炸金花抽水 5%</td><td>筹码在玩家之间流动，赌场从每个底池抽一口；其余牌桌不抽水</td></tr></table>
       <p><b>两个常见误区：</b></p>
       <ul><li><b>赌徒谬误</b>：「连开五把庄，该开闲了」。不会的，骰子和牌都没有记忆。</li>
       <li><b>输了就加倍（马丁格尔）</b>：连输几把，注码会翻到你押不起，一把就全没了。</li></ul>`,
@@ -224,7 +224,7 @@
       <tr><td>Roulette</td><td>97.3%</td><td>every bet is the same; only the swings differ</td></tr>
       <tr><td>Sic bo</td><td>97.2%</td><td>big/small; triples pay far less back</td></tr>
       <tr><td>Slots</td><td>≈ 95%</td><td>bet size changes the swings, not the return</td></tr>
-      <tr><td>Card room</td><td>no rake</td><td>chips only move between players: skill and nerve</td></tr></table>
+      <tr><td>Card room</td><td>5% rake on Brag</td><td>chips move between players and the house skims each Brag pot; the other tables are rake-free</td></tr></table>
       <p><b>Two classic traps:</b></p>
       <ul><li><b>Gambler's fallacy</b>: "five bankers in a row, player is due." It is not. Cards and dice have no memory.</li>
       <li><b>Double after a loss (martingale)</b>: a short losing streak makes the next bet bigger than your stack, and one loss takes everything.</li></ul>`,

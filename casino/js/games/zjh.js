@@ -4,7 +4,37 @@
   const CAT = { high: 'zj.high', pair: 'zj.pair', straight: 'zj.straight', flush: 'zj.flush', sflush: 'zj.sflush', trips: 'zj.trips' };
 
   class ZJH extends PvP.Table {
-    constructor() { super('zhajinhua', { stakeKey: 'ante' }); this.picking = false; }
+    constructor(id = 'zhajinhua') { super(id, { stakeKey: 'ante' }); this.picking = false; this.vip = id === 'vipzjh'; }
+    // the VIP salon checks you at the door, and the first time in, the God of Gamblers looks up
+    enter() {
+      if (this.vip && !vipOK()) {
+        C.modal({ title: t('vip.gateT'), body: U.h('p', null, t('vip.gate')) });
+        setTimeout(() => C.go('lobby'), 0);
+        return;
+      }
+      super.enter();
+      if (this.vip && !LS.get('vipMet', false)) { LS.set('vipMet', true); this.intro(); }
+    }
+    intro() {
+      const ace = this.L.seatIds.find(id => this.persona(id) === 'ace');
+      const m = ace ? this.L.seat(ace).meta : { color: '#14110f', av: '高' };
+      const ov = U.h('div', { class: 'vip-intro', role: 'dialog', 'aria-modal': 'true', 'aria-label': t('vip.introT') },
+        U.h('div', { class: 'vip-spot' }),
+        U.h('div', { class: 'vip-card' },
+          U.h('div', { class: 'pv-av big', style: `--c:${m.color}` }, m.av),
+          U.h('small', null, t('vip.who')),
+          U.h('h2', null, t('vip.introT')),
+          U.h('blockquote', null, '「' + t('vip.intro') + '」'),
+          U.h('p', { class: 'vip-terms' }, t('vip.terms')),
+          U.h('button', { class: 'btn btn-gold', type: 'button' }, t('vip.sit'))));
+      const done = () => { ov.classList.add('out'); setTimeout(() => ov.remove(), U.reduced ? 0 : 400); removeEventListener('keydown', esc); };
+      const esc = e => { if (e.key === 'Escape' || e.key === 'Enter') done(); };
+      ov.querySelector('button').onclick = () => { Sound.fx.click(); done(); };
+      addEventListener('keydown', esc);
+      document.body.appendChild(ov);
+      Sound.fx.drumroll(1.4); setTimeout(() => Sound.fx.thud(1), U.reduced ? 0 : 1300);
+      ov.querySelector('button').focus();
+    }
     setup() {
       this.center.innerHTML = `
         <div class="zj-pot"><div class="zj-pile"></div><div class="zj-pot-n">0</div><div class="zj-info"></div></div>`;
@@ -15,7 +45,7 @@
         if (seat) { this.picking = false; this.root.classList.remove('picking'); this.perform({ type: 'compare', target: seat.dataset.seat }); }
       });
     }
-    stakeHint() { return t('zj.stakeHint'); }
+    stakeHint() { return t(this.vip ? 'vip.terms' : 'zj.stakeHint'); }
     rules() { return t('zj.rules'); }
 
     renderGame(obs) {
@@ -124,6 +154,7 @@
           C.flyChip(this.potEl, w.querySelector('.pv-av'), 1000);
           FX.sparks(c.x, c.y, 26, 'gold', 1.2);
           if (s !== 'you') this.showMsg(t('zj.winBy', { who: this.name(s), c: ev.cat ? t(CAT[ev.cat]) : '' }), 'info');
+          if (ev.rake) this.chatLine(null, t('zj.rake', { n: U.fmt(ev.rake) }));
           await U.sleep(700);
           break;
         }
@@ -131,5 +162,11 @@
     }
   }
 
+  function vipOK() {
+    try { if (window.Services && Services.tier && Services.tier() >= 2) return true; } catch (e) { /* ignore */ }
+    return C.S.balance >= 200000;
+  }
+
   C.register(new ZJH());
+  C.register(new ZJH('vipzjh'));
 })();

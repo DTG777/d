@@ -27,10 +27,20 @@
       bio: { zh: '在澳门混了三十年的老江湖，慢条斯理，爱讲赌桌老话。', en: 'Thirty years on the Macau tables. Slow, calm, full of old gambling sayings.' } },
     mei: { av: '美', color: '#f39bd0', name: { zh: '小美', en: 'Mei' }, aggr: 0.4, bluff: 0.25, chatty: 0.8, honest: 0.1,
       bio: { zh: '甜美爱笑的新手模样，其实是扮猪吃老虎的高手。', en: 'Sweet and giggly, plays the beginner. Is not a beginner.' } },
-    ace: { av: '神', color: '#f6c94e', name: { zh: '赌神', en: 'Ace' }, aggr: 0.6, bluff: 0.3, chatty: 0.3, honest: 0.4,
-      bio: { zh: '传说中的赌神，话少，冷，偶尔一句让人发毛。', en: 'A legend. Few words, cold stare, each sentence lands like a chip on felt.' } },
-    fei: { av: '飞', color: '#b48cff', name: { zh: '大飞', en: 'Fei' }, aggr: 0.65, bluff: 0.4, chatty: 0.65, honest: 0.4,
-      bio: { zh: '急性子，输两把就上头，越输越大。', en: 'Hot-headed. Two losses in a row and he is chasing.' } }
+    ace: { av: '神', color: '#f6c94e', name: { zh: '赌神', en: 'Ace' }, aggr: 0.6, bluff: 0.3, chatty: 0.3, honest: 0.4, style: 'god',
+      bio: { zh: '传说中的赌神，只在贵宾厅出现。话少，冷，闷牌能闷到你心里发毛；他不出千，他只是比你更会算、更沉得住气。', en: 'A legend who only plays the VIP salon. Few words, cold stare, plays blind longer than your nerves can take. He does not cheat; he just counts better and waits longer than you.' } },
+    fei: { av: '飞', color: '#b48cff', name: { zh: '大飞', en: 'Fei' }, aggr: 0.65, bluff: 0.4, chatty: 0.65, honest: 0.4, style: 'tilt',
+      bio: { zh: '急性子，输两把就上头，越输越大。', en: 'Hot-headed. Two losses in a row and he is chasing.' } },
+    dao: { av: '刀', color: '#9fb3c8', name: { zh: '刀仔', en: 'Knife' }, aggr: 0.7, bluff: 0.2, chatty: 0.25, honest: 0.6, style: 'pro',
+      bio: { zh: '职业牌手，靠这个吃饭。连帽衫、耳机、面无表情，脑子里一直在算赔率。弱牌一律不玩，强牌一定打到底。', en: 'A professional grinder in a hoodie and earbuds, always counting odds. Folds the junk, punishes with the good stuff.' } },
+    wang: { av: '王', color: '#ffb35a', name: { zh: '王阿姨', en: 'Auntie Wang' }, aggr: 0.3, bluff: 0.1, chatty: 0.9, honest: 0.6, style: 'lucky',
+      bio: { zh: '退休会计，手腕上一串开过光的佛珠，出门前要看黄历。嘴上念叨财位，打起牌来比谁都抠。', en: 'Retired accountant with blessed prayer beads who checks the almanac before leaving home. Talks about lucky directions, plays tighter than anyone.' } },
+    chen: { av: '陈', color: '#c8283c', name: { zh: '陈总', en: 'Boss Chen' }, aggr: 0.6, bluff: 0.5, chatty: 0.5, honest: 0.2, style: 'boss',
+      bio: { zh: '上市公司老板，签单玩，一把注码顶别人一年工资。表面风光，其实厂子早就资不抵债，他在这里找的不是钱，是面子。', en: 'Listed-company chairman who plays on credit, a year of someone\'s salary per hand. His factory is quietly insolvent; he is here for face, not money.' } },
+    zhou: { av: '周', color: '#5ad1ff', name: { zh: '小周', en: 'Zhou' }, aggr: 0.55, bluff: 0.3, chatty: 0.6, honest: 0.5, style: 'tilt',
+      bio: { zh: '大三学生，借了三个网贷来翻本，手机一直在震。赢一把就笑，输一把就加倍。', en: 'Third-year student playing on three online loans, phone buzzing nonstop. Laughs after a win, doubles after a loss.' } },
+    yan: { av: '燕', color: '#e86fb0', name: { zh: '燕姐', en: 'Madam Yan' }, aggr: 0.45, bluff: 0.35, chatty: 0.85, honest: 0.1, style: 'junket',
+      bio: { zh: '叠码仔，贵宾厅的常客。笑起来很亲切，你一输她就递上名片：「额度的事好商量。」', en: 'A junket agent who lives in the VIP salon. Warm smile; the moment you lose, a business card appears: "Credit can be arranged."' } }
   };
 
   // lines by situation; {n} = an amount, {who} = a player name
@@ -86,15 +96,26 @@
       oldk: { greet: ['小赌怡情，大赌伤身。'], fold: ['该走就走，这叫纪律。'], win: ['牌桌上，耐心值钱。'], lose: ['输赢都是常事。'], taunt: ['年轻人，沉住气。'], replyAny: ['牌桌上没有朋友。'] },
       mei: { bluff: ['哎呀我也不知道这牌大不大～', '这个……能赢吗？我跟一下嘛。'], sandbag: ['我不太会，跟着玩～', '是不是要输了呀……'], win: ['诶？我赢了？好开心！'], greet: ['我第一次玩，大家手下留情哦～'] },
       ace: { greet: ['……'], bluff: ['你的牌，我已经看到了。'], strongTalk: ['你输了。'], taunt: ['……'], win: ['意料之中。'], lose: ['……'], replyAny: ['……', '嗯。'] },
-      fei: { tilt: ['再来！今天不赢回来不走！', '全压！我就不信了！'], lose: ['靠！又是这样！'], raise: ['怕个锤子，加！'] }
+      fei: { tilt: ['再来！今天不赢回来不走！', '全压！我就不信了！'], lose: ['靠！又是这样！'], raise: ['怕个锤子，加！'] },
+      dao: { greet: ['……'], fold: ['期望值是负的，弃。'], raise: ['加。'], win: ['正常。'], lose: ['方差而已。'], taunt: ['你下注的节奏变了。'], replyBluff: ['你自己算算赔率。'], replyAny: ['专心。'] },
+      wang: { greet: ['今天黄历说宜求财，阿姨坐东南！', '小伙子，坐阿姨旁边沾沾福气～'], fold: ['不跟不跟，今天不宜冒进。'], win: ['哎哟，菩萨保佑！', '阿姨就说今天财位好嘛～'], lose: ['唉，是我刚才念错了一句。'], call: ['跟一点点嘛。'], replyAny: ['年轻人少熬夜哦。', '你妈妈知道你在这吗？'] },
+      chen: { greet: ['今天我做东，输了算我的。'], raise: ['加到顶，我签单。', '这点钱，陪你玩玩。'], win: ['生意场上也是这个道理。'], lose: ['小钱，小钱。', '……再拿二十万的码。'], bluff: ['我做生意从来不看底牌。'], tilt: ['经理！再批一百万额度！'], replyThreat: ['年轻人，口气别太大。'] },
+      zhou: { greet: ['我、我就玩几把……'], tilt: ['这把一定能回本！', '最后一把，真的最后一把！'], win: ['卧槽！回本了回本了！'], lose: ['完了……这个月的还款……', '手机又响了……'], raise: ['拼了！'], replyAny: ['别说话，我在算我还差多少……'] },
+      yan: { greet: ['老板好眼生，第一次来贵宾厅？'], win: ['承让～下次我请老板喝茶。'], lose: ['老板手气真好，要不要加点额度玩大的？'], taunt: ['老板，筹码不够跟我说一声就行～'], replyAny: ['老板说什么都对～', '额度的事，随时找我。'] },
+      ace: { greet: ['……坐。'], bluff: ['你的牌，我已经看到了。', '跟。我等你。'], strongTalk: ['你输了。'], taunt: ['你的手在抖。', '你眨了两次眼。'], win: ['意料之中。', '赌桌上，沉得住气的人赢。'], lose: ['……不错。'], call: ['……'], replyBluff: ['你在怕。'], replyThreat: ['……'], replyAny: ['……', '嗯。', '出牌。'] }
     },
     en: {
       hao: { raise: ['Money is no object. Raise!'], win: ['See that? That is presence.'], lose: ['Pocket change.'], taunt: ['If you cannot afford it, kid, step aside.'] },
       ling: { taunt: ['Sweaty palms, darling?', 'Your eyes just moved.'], sandbag: ['I am only here for the tea.'], win: ['Thank you for your business.'], replyBluff: ['Do I look like I need your chips?'] },
       oldk: { greet: ['Small bets for fun, big bets for regret.'], fold: ['Know when to walk. That is discipline.'], win: ['Patience pays at this table.'], lose: ['Win some, lose some.'], taunt: ['Easy, youngster.'], replyAny: ['No friends at the table.'] },
       mei: { bluff: ['Is this good? I cannot tell~', 'Um... I will just call, is that ok?'], sandbag: ['I do not really know this game hehe', 'Am I losing already?'], win: ['Wait, I won? Yay!'], greet: ['First time here, be gentle~'] },
-      ace: { greet: ['...'], bluff: ['I have already seen your cards.'], strongTalk: ['You lose.'], taunt: ['...'], win: ['As expected.'], lose: ['...'], replyAny: ['...', 'Hm.'] },
-      fei: { tilt: ['Again! Not leaving till I win it back!', 'All in! Come on!'], lose: ['Not again!'], raise: ['Scared of what? Raise!'] }
+      ace: { greet: ['... Sit.'], bluff: ['I have already seen your cards.', 'Call. I will wait.'], strongTalk: ['You lose.'], taunt: ['Your hand is shaking.', 'You blinked twice.'], win: ['As expected.', 'The calm one wins.'], lose: ['... Not bad.'], call: ['...'], replyBluff: ['You are scared.'], replyThreat: ['...'], replyAny: ['...', 'Hm.', 'Play.'] },
+      fei: { tilt: ['Again! Not leaving till I win it back!', 'All in! Come on!'], lose: ['Not again!'], raise: ['Scared of what? Raise!'] },
+      dao: { greet: ['...'], fold: ['Negative EV. Fold.'], raise: ['Raise.'], win: ['Standard.'], lose: ['Variance.'], taunt: ['Your bet timing changed.'], replyBluff: ['Do the pot odds yourself.'], replyAny: ['Focus.'] },
+      wang: { greet: ['The almanac says good fortune today, Auntie sits facing southeast!', 'Sit by Auntie, young man, catch some luck~'], fold: ['No no, not a day for risks.'], win: ['Oh my, the Buddha is kind!', 'Told you my lucky direction was good~'], lose: ['Ai, I must have said the prayer wrong.'], call: ['Just a little call.'], replyAny: ['Do not stay up so late, dear.', 'Does your mother know you are here?'] },
+      chen: { greet: ['Tonight is on me. Losses included.'], raise: ['Max it. Put it on my tab.', 'Pocket money. Let us play.'], win: ['Same as business, really.'], lose: ['Small change.', '... Bring me another two hundred thousand in chips.'], bluff: ['In business I never look at my cards.'], tilt: ['Manager! Another million in credit!'], replyThreat: ['Careful, young man.'] },
+      zhou: { greet: ['I-I am just playing a few hands...'], tilt: ['This one wins it all back!', 'Last hand, really the last one!'], win: ['YES! I am even again!'], lose: ['No... this month\'s repayment...', 'My phone is buzzing again...'], raise: ['All or nothing!'], replyAny: ['Quiet, I am working out how much I still owe...'] },
+      yan: { greet: ['New face! First time in the VIP salon, boss?'], win: ['You let me have that one~ tea is on me next time.'], lose: ['Lucky hands, boss. Want a bigger line of credit to play bigger?'], taunt: ['Short on chips, boss? Just say the word~'], replyAny: ['Whatever you say, boss~', 'Credit? Any time, call me.'] }
     }
   };
   const pick = (rng, a) => a[Math.floor(rng() * a.length)];
@@ -109,7 +130,7 @@
   function strengthOf(game, obs) {
     const e = E.list[game];
     try {
-      if (game === 'zhajinhua') return obs.seen && obs.seen[obs.seat] && obs.hand[0] !== '??' ? e.strength(obs.hand) : null;
+      if (isZJ(game)) return obs.seen && obs.seen[obs.seat] && obs.hand[0] !== '??' ? e.strength(obs.hand) : null;
       if (game === 'niuniu') { const known = obs.hand.filter(c => c !== '??'); if (known.length < 4) return null; const pts = known.map(c => 'TJQK'.includes(c[0]) ? 10 : c[0] === 'A' ? 1 : +c[0]); return Math.min(1, (pts.reduce((a, b) => a + b, 0) % 10) / 10 + 0.2); }
       if (game === 'doudizhu') return obs.hand && obs.hand.length ? Math.max(0, Math.min(1, e.strength(obs.hand) / 8)) : null;
       if (game === 'mahjong') return obs.shanten != null ? Math.max(0, 1 - (obs.shanten + 1) / 6) : null;
@@ -117,6 +138,24 @@
     return null;
   }
   const AGGRESSIVE = { raise: 1, compare: 1, bid: 1, grab: 1 };
+  const isZJ = g => g === 'zhajinhua' || g === 'vipzjh';
+  /* the God of Gamblers (and the professional) at 炸金花: no peeking, no tricks, just discipline and pressure.
+     He looks early (now and then he sits blind for a lap to unsettle the table), folds the junk before it costs him,
+     raises hard with monsters, squeezes when only one player is left, and compares only when he is ahead
+     of what a caller usually holds. Simulated against the VIP regulars he wins about three antes a hand */
+  function godZJ(obs, a, s, has, rng) {
+    if (has('start')) return a;
+    const me = obs.seat, alive = Object.keys(obs.hands).filter(x => !obs.folded[x]), heads = alive.length === 2;
+    const call = () => has('call') ? { type: 'call' } : { type: 'fold' };
+    const up = k => { const lv = has('raise') && has('raise').params.level.enum; return lv ? { type: 'raise', level: lv[Math.min(k, lv.length - 1)] } : call(); };
+    const cmp = () => has('compare') ? { type: 'compare', target: has('compare').params.target.enum[0] } : call();
+    if (!obs.seen[me]) return obs.lap < 1 && rng() < 0.35 && has('call') ? call() : { type: 'look' };
+    const need = 0.55 + 0.05 * (alive.length - 1) + 0.05 * Math.log2(obs.unit || 1);
+    if (s >= 0.92) return obs.lap >= 5 ? cmp() : up(2);
+    if (s >= need) return heads && obs.lap >= 2 ? cmp() : call();
+    if (heads && rng() < 0.3) return up(0);
+    return { type: 'fold' };
+  }
 
   /* ---------- scripted brain ---------- */
   function scripted(game, personaId = 'hao', { lang = 'zh', rng = Math.random } = {}) {
@@ -129,8 +168,15 @@
       const has = t => obs.legal.find(l => l.type === t);
       const s = strengthOf(game, obs);
       // character changes play: aggressive personas raise light, tilted players chase
-      if (game === 'zhajinhua' && a.type === 'call' && has('raise') && (rng() < P.aggr * 0.25 || losing >= 2 && rng() < 0.4)) a = { type: 'raise', level: has('raise').params.level.enum[0] };
-      if (game === 'zhajinhua' && a.type === 'fold' && s != null && s > 0.35 && rng() < P.bluff * 0.5 && has('call')) a = { type: 'call' };
+      if (isZJ(game) && (P.style === 'god' || P.style === 'pro')) a = godZJ(obs, a, s, has, rng);
+      else if (isZJ(game)) {
+        const tilted = P.style === 'tilt' && losing >= 2;
+        if (a.type === 'call' && has('raise') && (rng() < P.aggr * 0.25 || tilted && rng() < 0.6 || losing >= 2 && rng() < 0.4)) {
+          const lv = has('raise').params.level.enum;
+          a = { type: 'raise', level: P.style === 'boss' || tilted ? lv[lv.length - 1] : lv[0] };                               // the boss and the tilted go to the top
+        }
+        if (a.type === 'fold' && s != null && s > 0.35 && (rng() < P.bluff * 0.5 || tilted) && has('call')) a = { type: 'call' };
+      }
       if (game === 'niuniu' && a.type === 'bet' && losing >= 2) { const en = has('bet').params.mult.enum; a = { type: 'bet', mult: en[en.length - 1] }; }
       // talk
       let say = null, tell = null;

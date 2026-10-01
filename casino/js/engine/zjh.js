@@ -51,18 +51,19 @@
   const ZJ_MAX_ROUNDS = 12;
 
   function zjCost(st, seat) { return st.unit * st.ante * (st.seen[seat] ? 2 : 1); }
-  E.define({
-    id: 'zhajinhua', kind: 'pvp', mode: 'pvp', seats: 5,
-    name: { zh: '炸金花', en: 'Three Card Brag' },
-    doc: 'Up to 5 players, 3 cards each, everyone antes into the pot. Players start blind (闷) and may look at any time on their turn. Each turn: call (跟) the current stake, raise (加注) to a higher stake level, fold (弃), or compare (比牌) with another player still in: the lower hand folds (ties lose for the one who asked). A blind player pays the stake, a player who has seen pays double. Last player standing takes the pot; after ' + ZJ_MAX_ROUNDS + ' rounds everyone left shows down. Hands high to low: trips (豹子) > straight flush (顺金) > flush (金花) > straight (顺子) > pair (对子) > high card; A-2-3 is the lowest straight. Special: an off-suit 2-3-5 beats trips only.',
-    ANTES: ZJ_ANTES, LEVELS: ZJ_LEVELS, CAT: ZJ_CAT, CAT_NAME: ZJ_NAME, rank: zjRank, beats: zjBeats, strength: zjStrength,
-    init: (rng, opts = {}) => ({ seats: (opts.seats || ['p1', 'p2', 'p3', 'p4', 'p5']).slice(0, 5), phase: 'idle', round: 0, dealer: null, result: null, hands: {}, seen: {}, folded: {}, known: {} }),
+  // the house takes a rake from every contested pot (5%, capped at 10 antes); chips otherwise only move between players
+  const zjTable = o => E.define({
+    id: o.id, kind: 'pvp', mode: 'pvp', seats: o.seats,
+    name: o.name,
+    doc: o.lead + ' Up to ' + o.seats + ' players, 3 cards each, everyone antes into the pot. Players start blind (闷) and may look at any time on their turn. Each turn: call (跟) the current stake, raise (加注) to a higher stake level, fold (弃), or compare (比牌) with another player still in: the lower hand folds (ties lose for the one who asked). A blind player pays the stake, a player who has seen pays double. Last player standing takes the pot; after ' + ZJ_MAX_ROUNDS + ' rounds everyone left shows down. Hands high to low: trips (豹子) > straight flush (顺金) > flush (金花) > straight (顺子) > pair (对子) > high card; A-2-3 is the lowest straight. Special: an off-suit 2-3-5 beats trips only. The house rakes 5% of every contested pot, capped at 10 antes.',
+    ANTES: o.antes, RAKE: o.rake, LEVELS: ZJ_LEVELS, CAT: ZJ_CAT, CAT_NAME: ZJ_NAME, rank: zjRank, beats: zjBeats, strength: zjStrength,
+    init: (rng, opts = {}) => ({ seats: (opts.seats || ['p1', 'p2', 'p3', 'p4', 'p5']).slice(0, o.seats), rake: o.rake, cap: o.cap, phase: 'idle', round: 0, dealer: null, result: null, hands: {}, seen: {}, folded: {}, known: {} }),
     turn: st => st.phase === 'play' ? st.turn : st.seats[0],
     legal(st, ctx) {
       const me = ctx.seat;
       if (st.phase !== 'play') {
         if (me !== st.seats[0]) return [];
-        const can = ZJ_ANTES.filter(a => a * 30 <= ctx.balance && st.seats.every(s => ctx.balances[s] >= a));
+        const can = o.antes.filter(a => a * 30 <= ctx.balance && st.seats.every(s => ctx.balances[s] >= a));
         return can.length ? [{ type: 'start', params: { ante: { enum: can } }, desc: 'Everyone antes this amount and a new hand is dealt. Stakes can climb to 20x ante per call (40x once you have looked).' }] : [];
       }
       if (me !== st.turn) return [];
@@ -167,6 +168,8 @@
       return { type: 'fold' };
     }
   });
+  zjTable({ id: 'zhajinhua', seats: 5, antes: ZJ_ANTES, rake: 0.05, cap: 10, name: { zh: '炸金花', en: 'Three Card Brag' }, lead: 'The open card room.' });
+  zjTable({ id: 'vipzjh', seats: 4, antes: [1000, 2000, 5000, 10000, 20000], rake: 0.05, cap: 10, name: { zh: '贵宾厅炸金花', en: 'VIP Brag' }, lead: 'The private VIP salon: high antes, and the legend everyone calls the God of Gamblers sits here.' });
   function zjFinish(st, alive, events, debit, ctx, showdown) {
     let winner = alive[0];
     if (alive.length > 1) {
@@ -175,11 +178,15 @@
     }
     st.phase = 'done';
     st.result = { winner, pot: st.pot, shown: showdown ? alive : [], showdown: !!showdown, cat: zjRank(st.hands[winner]).cat };
-    events.push({ t: 'win', seat: winner, pot: st.pot, cat: alive.length > 1 ? st.result.cat : null });
-    const ledger = { [winner]: st.pot };
+    // no rake when nobody put in more than the ante
+    const contested = st.pot > st.ante * st.seats.length;
+    const rake = contested && st.rake ? Math.min(Math.round(st.pot * st.rake), st.ante * (st.cap || 10)) : 0, take = st.pot - rake;
+    st.result.rake = rake;
+    events.push({ t: 'win', seat: winner, pot: take, rake, cat: alive.length > 1 ? st.result.cat : null });
+    const ledger = { [winner]: take };
     for (const s of st.seats) {
-      const put = st.put[s] || 0, net = (s === winner ? st.pot : 0) - put;
-      events.push({ t: 'settle', seat: s, bet: put, ret: s === winner ? st.pot : 0, net, win: s === winner });
+      const put = st.put[s] || 0, net = (s === winner ? take : 0) - put;
+      events.push({ t: 'settle', seat: s, bet: put, ret: s === winner ? take : 0, net, win: s === winner });
     }
     return { events, debit, ledger, players: st.seats.slice(), done: true };
   }

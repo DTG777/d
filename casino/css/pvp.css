@@ -267,7 +267,7 @@
   .pos-left { left: 6px; } .pos-right { right: 6px; }
   .pos-top-left { left: 6px; top: 10px; } .pos-top-right { right: 6px; top: 10px; }
   .pos-top { top: 10px; }
-  .pv-zhajinhua .pos-left, .pv-zhajinhua .pos-right { top: 50%; }
+  .pv-zhajinhua .pos-left, .pv-zhajinhua .pos-right, .pv-vipzjh .pos-left, .pv-vipzjh .pos-right { top: 50%; }
   .pv-cards { --cw: 28px; }
   .pos-left .pv-out { left: 2px; top: calc(100% + 24px); transform: none; }
   .pos-right .pv-out { right: 2px; top: calc(100% + 24px); transform: none; }
@@ -281,7 +281,7 @@
   .pos-top .pv-bubble::after { left: 50%; margin-left: -6px; }
   .pos-top-right .pv-bubble::after { left: auto; right: 20px; }
   .pv-hand { --cw: 54px; }
-  .pv-zhajinhua .pv-hand .card + .card, .pv-niuniu .pv-hand .card + .card { margin-left: calc(var(--cw) * -.2); }
+  .pv-zhajinhua .pv-hand .card + .card, .pv-vipzjh .pv-hand .card + .card, .pv-niuniu .pv-hand .card + .card { margin-left: calc(var(--cw) * -.2); }
   .pv-doudizhu .pv-hand { --cw: 50px; }
   .dz-play-row { --cw: 26px; }
   .dz-bottom { --cw: 30px; }
@@ -343,3 +343,28 @@
 .tile-meta { flex-wrap: wrap; }
 .tile-meta > span { white-space: nowrap; }
 .ai-set label.set-row { display: flex; color: var(--ivory); font-size: 15px; }
+
+/* ---------- VIP salon: black felt, gold rail, the God of Gamblers' entrance ---------- */
+.tile .vip-badge { font: 800 11px var(--f-ui); color: #1a1206; background: linear-gradient(180deg, #ffe9a8, #c99a2e); padding: 3px 8px; border-radius: 6px; letter-spacing: .1em; }
+.tile-vipzjh { border-color: rgba(246, 201, 78, .55); }
+.tile-vipzjh .tile-art { background: radial-gradient(ellipse at 50% 35%, #3a2e1a, #14100a 60%, #050403); }
+.pv-vipzjh .pv-felt {
+  background: radial-gradient(ellipse at 50% 25%, #2e2a24, #16130f 50%, #070605 90%);
+  box-shadow: 0 0 0 10px #1a120a, 0 0 0 12px #f6c94e, 0 0 0 13px #000, var(--shadow), inset 0 0 90px rgba(0, 0, 0, .6), inset 0 0 0 2px rgba(246, 201, 78, .18);
+}
+.pv-vipzjh .pv-felt::after { content: '貴賓'; position: absolute; left: 50%; top: 82%; transform: translate(-50%, -50%); pointer-events: none;
+  font: 400 clamp(48px, 9vw, 96px)/1 var(--f-display); letter-spacing: .3em; color: rgba(246, 201, 78, .06); }
+.pv-vipzjh .zj-pot-n { color: #ffe08a; }
+.vip-intro { position: fixed; inset: 0; z-index: 80; display: grid; place-items: center; padding: 16px; background: rgba(0, 0, 0, .86); animation: vipIn .5s ease-out; }
+.vip-intro.out { opacity: 0; transition: opacity .4s; }
+.vip-spot { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse 34% 60% at 50% 0%, rgba(255, 232, 170, .28), transparent 70%); animation: vipSpot 1.4s ease-out; }
+.vip-card { position: relative; display: grid; justify-items: center; gap: 8px; text-align: center; max-width: 420px; width: 100%; padding: 28px 20px 22px; border-radius: 18px;
+  background: linear-gradient(180deg, #1c160e, #0b0906); border: 1px solid rgba(246, 201, 78, .5); box-shadow: 0 0 60px rgba(246, 201, 78, .15), 0 30px 80px #000; }
+.vip-card .pv-av.big { width: 76px; height: 76px; font-size: 34px; box-shadow: 0 0 0 3px #f6c94e, 0 0 30px rgba(246, 201, 78, .45); }
+.vip-card small { font: 700 12px var(--f-ui); letter-spacing: .2em; color: var(--muted); text-transform: uppercase; }
+.vip-card h2 { margin: 0; font: 400 40px/1.1 var(--f-display); background: var(--gold-text); -webkit-background-clip: text; background-clip: text; color: transparent; letter-spacing: .12em; }
+.vip-card blockquote { margin: 4px 0; font-size: 17px; color: var(--text, #f4ead2); line-height: 1.6; }
+.vip-terms { margin: 0 0 8px; font: 700 13px var(--f-ui); color: #ffe08a; background: rgba(246, 201, 78, .08); border: 1px solid rgba(246, 201, 78, .25); padding: 6px 12px; border-radius: 999px; }
+@keyframes vipIn { from { opacity: 0; } }
+@keyframes vipSpot { from { opacity: 0; transform: scaleX(.3); } }
+@media (prefers-reduced-motion: reduce) { .vip-intro, .vip-spot { animation: none; } .vip-intro.out { transition: none; } }

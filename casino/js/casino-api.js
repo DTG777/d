@@ -46,6 +46,10 @@
   const B = E.Brain;
   const PIDS = ['hao', 'ling', 'oldk', 'mei', 'ace', 'fei'];
   const HOUSE = PIDS.map(id => ({ persona: id, ...B.PERSONAS[id] }));
+  // who sits where: each room keeps its regulars; the VIP salon is where the God of Gamblers plays
+  const LINEUP = { zhajinhua: ['hao', 'mei', 'fei', 'zhou'], vipzjh: ['ace', 'chen', 'yan'], niuniu: ['hao', 'chen', 'dao', 'ling'], doudizhu: ['oldk', 'wang'], mahjong: ['wang', 'ling', 'oldk'] };
+  const BANK = { vipzjh: 5e6 };
+  const bank = id => BANK[id] || 200000;
 
   /* ---------- AI opponents: config lives only in this browser's storage ---------- */
   const AI_DEF = { enabled: false, baseURL: '', apiKey: '', model: '', seats: 1 };
@@ -75,9 +79,10 @@
       this.table.rng = E.rng.crypto();
     }
     houseSeat(seat, i) {
-      const h = HOUSE[(i + this.id.length) % HOUSE.length];
+      const ids = LINEUP[this.id] || PIDS, pid = ids[(i + (LINEUP[this.id] ? 0 : this.id.length)) % ids.length];
+      const h = { persona: pid, ...B.PERSONAS[pid] };
       const key = this.id + ':' + seat;
-      if (!(wallets[key] > 2000)) wallets[key] = 200000;
+      if (!(wallets[key] > bank(this.id) / 100)) wallets[key] = bank(this.id);
       return { id: seat, name: h.name[I18N.lang] || h.name.en, balance: wallets[key], policy: this.brain(h.persona, i), meta: { ...h, house: true } };
     }
     // a persona brain for a house chair: scripted, or a language model for the first `seats` chairs when AI is on
@@ -119,9 +124,9 @@
     rebuy(events) {
       for (const id of this.table.order) {
         const s = this.table.seats[id];
-        if (id === 'you' || this.agents[id] || s.balance >= 20000) continue;
-        s.balance += 200000;
-        events.push({ t: 'rebuy', seat: id, amount: 200000 });
+        if (id === 'you' || this.agents[id] || s.balance >= bank(this.id) / 10) continue;
+        s.balance += bank(this.id);
+        events.push({ t: 'rebuy', seat: id, amount: bank(this.id) });
       }
     }
     persist() { for (const id of this.table.order) if (id !== 'you' && this.agents[id] == null) wallets[this.id + ':' + id] = this.table.seats[id].balance; saveWallets(); }
@@ -230,7 +235,7 @@
 
   /* ---------- public API ---------- */
   const Casino = {
-    version: '1.0', Jackpots, on, off, emit, live, HOUSE,
+    version: '1.0', Jackpots, on, off, emit, live, HOUSE, LINEUP,
     games: () => A.gamesList(),
     describe: id => A.describe(id),
     observe: (id, seat = 'you') => live(id).observe(seat),

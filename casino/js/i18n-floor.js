@@ -38,6 +38,11 @@
     'fl.p.mei': '哥哥陪我打一圈嘛|我刚学会的|今天要胡大的|你是不是在让我呀',
     'fl.p.ace': '……|坐。|运气？我从来不信|你的手在抖|筹码够吗？',
     'fl.p.fei': '来来来，抢庄！|牛牛！|今天不翻本不走|兄弟你下多少？',
+    'fl.p.dao': '……|看牌，不看人|你坐下就知道了|运气是给不会算的人准备的',
+    'fl.p.wang': '哎哟，小伙子长得真精神|阿姨今天手气好|我跳广场舞都没这么开心|阿姨请你喝茶',
+    'fl.p.chen': '我在城南有三栋楼|这点钱算什么|老弟，周转一下，下周就还|别跟我讲道理，跟我讲牌',
+    'fl.p.zhou': '最后一把，真的最后一把|兄弟借我五百，明天还|我爸妈以为我在图书馆|这个月的网贷还没还……',
+    'fl.p.yan': '老板，第一次来？|额度的事找我就行|在这儿，没有解决不了的事|玩得开心，钱的事不急',
 
     'fl.hi.bartender': '晚上好，想喝点什么？', 'fl.hi.cashier': '您好，兑换筹码还是办理借码？',
     'fl.hi.club': '会员中心，看看您的积分？', 'fl.hi.host': '欢迎光临，几位？', 'fl.hi.chef': '今天的龙虾很新鲜',
@@ -105,6 +110,11 @@
     'fl.p.mei': 'Play a round with me?|I just learned this|I want a big win today|Are you letting me win?',
     'fl.p.ace': '…|Sit.|Luck? Never believed in it|Your hand is shaking|Got enough chips?',
     'fl.p.fei': 'Come on, grab the bank!|Bull bull!|Not leaving till I\'m even|How much you in for?',
+    'fl.p.dao': '…|I watch the cards, not the faces|Sit and you\'ll see|Luck is for people who can\'t count',
+    'fl.p.wang': 'Oh, what a handsome young man|Auntie\'s lucky today|More fun than square dancing|Let Auntie buy you tea',
+    'fl.p.chen': 'I own three buildings across town|This is pocket change|Spot me a bit, I\'ll pay next week|Don\'t lecture me. Deal.',
+    'fl.p.zhou': 'Last hand. Really the last one|Lend me 500, I\'ll pay you tomorrow|My parents think I\'m at the library|This month\'s loan app payment is due…',
+    'fl.p.yan': 'First time here, boss?|Credit? Just talk to me|Nothing here can\'t be arranged|Have fun. The money can wait',
 
     'fl.hi.bartender': 'Evening. What can I get you?', 'fl.hi.cashier': 'Hello, chips or a marker?',
     'fl.hi.club': 'Players club. Check your points?', 'fl.hi.host': 'Welcome. Table for one?', 'fl.hi.chef': 'The lobster is fresh today',

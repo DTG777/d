@@ -17,7 +17,7 @@ for (const f of files) {
   for (const m of src.matchAll(/'((?:tut|aca|bjc|cl|cs|tb)\.[\w.]+)'/g)) keys.add(m[1]);
 }
 // dynamic keys
-['slots', 'classic', 'caishen', 'treasure', 'blackjack', 'roulette', 'baccarat', 'sicbo', 'crash', 'plinko', 'zhajinhua', 'niuniu', 'doudizhu', 'mahjong'].forEach(g => { keys.add('game.' + g); keys.add('tag.' + g); });
+['slots', 'classic', 'caishen', 'treasure', 'blackjack', 'roulette', 'baccarat', 'sicbo', 'crash', 'plinko', 'zhajinhua', 'vipzjh', 'niuniu', 'doudizhu', 'mahjong'].forEach(g => { keys.add('game.' + g); keys.add('tag.' + g); });
 ['cherry', 'lemon', 'bell', 'bar', 'diamond', 'seven', 'wild', 'scatter'].forEach(s => keys.add('sym.' + s));
 ['red', 'black', 'green', 'doz1', 'doz2', 'doz3'].forEach(s => keys.add('rl.' + s));
 ['p', 'b', 't'].forEach(s => keys.add('bc.bead.' + s));
@@ -43,7 +43,7 @@ for (const m of FLOOR.matchAll(/(?:svc|fn): '(\w+)', ux/g)) { keys.add('svc.' + 
 for (const m of FLOOR.matchAll(/talk: '(\w+)'/g)) if (m[1] !== 'persona') keys.add('npc.' + m[1]);
 for (const m of FLOOR.matchAll(/'sign', '(\w+)'/g)) keys.add('zone.' + m[1]);
 ['slot', 'slotwin', 'tablewin', 'table', 'card', 'dealer', 'bar', 'din', 'walk', 'waitress', 'pitboss', 'vip', 'lottoguy', 'pianist'].forEach(k => keys.add('fl.chat.' + k));
-['hao', 'ling', 'oldk', 'mei', 'ace', 'fei'].forEach(k => keys.add('fl.p.' + k));
+['hao', 'ling', 'oldk', 'mei', 'ace', 'fei', 'dao', 'wang', 'chen', 'zhou', 'yan'].forEach(k => keys.add('fl.p.' + k));
 ['bartender', 'cashier', 'club', 'host', 'chef', 'lotto', 'concierge', 'shop', 'hotel', 'bell', 'doorman', 'pianist'].forEach(k => keys.add('fl.hi.' + k));
 ['taken', 'marquee.slots', 'marquee.pit', 'music.on', 'music.off', 'vipSub', 'pvpSub', 'use', 'play'].forEach(k => keys.add('fl.' + k));
 // services: menus and tiers

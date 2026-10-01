@@ -245,7 +245,12 @@
     oldk: { skin: '#d9a27a', hair: '#c8c8c8', hs: 0, top: '#7a6a4a', bot: '#3a3226', glasses: 1 },
     mei: { skin: '#f5d6bf', hair: '#2b1d14', hs: 1, top: '#f39bd0', dress: 1, fem: 1 },
     ace: { skin: '#e8b88f', hair: '#0c0a08', hs: 4, top: '#14110f', bot: '#14110f', tie: '#f6c94e', glasses: 2 },
-    fei: { skin: '#c68863', hair: '#14100c', hs: 3, top: '#6a3fb0', bot: '#14110f' }
+    fei: { skin: '#c68863', hair: '#14100c', hs: 3, top: '#6a3fb0', bot: '#14110f' },
+    dao: { skin: '#d49a72', hair: '#0c0a08', hs: 0, top: '#22262e', bot: '#14110f', glasses: 2 },
+    wang: { skin: '#f0c4a0', hair: '#5a4a3a', hs: 1, top: '#c84a6e', dress: 1, fem: 1 },
+    chen: { skin: '#e0a882', hair: '#2a2420', hs: 0, top: '#4a3a2a', bot: '#2a2016', chain: 1, tie: '#c8283c' },
+    zhou: { skin: '#f1c9a5', hair: '#14100c', hs: 3, top: '#5a7a9a', bot: '#2a3a4a' },
+    yan: { skin: '#f5d6bf', hair: '#0c0a08', hs: 2, top: '#8a1424', dress: 1, fem: 1, trim: '#f6c94e' }
   };
 
   const ACT = [];
@@ -259,12 +264,13 @@
   // the regulars: personas at the card room and the VIP salon
   const SEATS = (x, y, w, h) => ({ N: [x + w / 2, y - 0.25, 0], S: [x + w / 2, y + h + 0.45, 1], W: [x - 0.4, y + h / 2 + 0.3, 3], E: [x + w + 0.4, y + h / 2 + 0.3, 2] });
   function seat(tx, ty, dir, o = {}) { return actor(Object.assign({ kind: 'seated', tx, ty, dir, seated: true }, o)); }
-  [['hao', 0, 'N'], ['ling', 0, 'W'], [null, 0, 'E'], ['oldk', 1, 'N'], [null, 1, 'E'], ['fei', 2, 'W'], [null, 2, 'N'], ['mei', 3, 'N'], [null, 3, 'W'], [null, 3, 'E'], [null, 4, 'N'], [null, 4, 'E']].forEach(([p, ti, side]) => {
+  [['hao', 0, 'N'], ['mei', 0, 'W'], [null, 0, 'E'], ['oldk', 1, 'N'], ['wang', 1, 'E'], ['dao', 2, 'W'], [null, 2, 'N'], ['ling', 3, 'N'], [null, 3, 'W'], [null, 3, 'E'], ['zhou', 4, 'N'], ['fei', 4, 'E']].forEach(([p, ti, side]) => {
     const [g, x, y] = CARDT[ti], s = SEATS(x, y, 3, 3)[side];
     seat(s[0], s[1], s[2], p ? { persona: p, look: PLOOK[p], game: g, talk: 'persona' } : { game: g, talk: 'card' });
   });
   const ace = seat(58, 5.75, 0, { persona: 'ace', look: PLOOK.ace, game: 'vip', talk: 'persona' });
-  seat(54.6, 7.8, 3, { talk: 'vipguest', look: Object.assign(randLook(false), { top: '#14110f', bot: '#14110f', chain: 1 }) });
+  seat(54.6, 7.8, 3, { persona: 'chen', look: PLOOK.chen, game: 'vip', talk: 'persona' });
+  seat(61.4, 7.8, 2, { persona: 'yan', look: PLOOK.yan, game: 'vip', talk: 'persona' });
   [[55.2, 4.3], [60.8, 4.3]].forEach(([x, y]) => actor({ kind: 'staff', tx: x, ty: y, dir: 0, look: STAFF.guard(), talk: 'bodyguard' }));
   const guard = actor({ kind: 'staff', role: 'guard', tx: 56.2, ty: 16.3, dir: 0, look: STAFF.guard(), talk: 'guard' });
   // pit: dealers behind, players in front
@@ -1059,7 +1065,7 @@
       U.h('dl', { class: 'stats-grid' },
         U.h('dt', null, t('pv.style')), U.h('dd', null, t(P.aggr > 0.55 ? 'pv.loose' : P.aggr < 0.4 ? 'pv.tight' : 'pv.steady')),
         U.h('dt', null, t('pv.bluffs')), U.h('dd', null, '●'.repeat(Math.round(P.bluff * 10) || 1)),
-        U.h('dt', null, t('fl.plays')), U.h('dd', null, t('game.' + (a.game === 'vip' ? 'zhajinhua' : a.game)))));
+        U.h('dt', null, t('fl.plays')), U.h('dd', null, t('game.' + gameId(a.game)))));
     C.modal({ title: P.name[I18N.lang] || P.name.en, body, actions: [
       { label: t('fl.later'), onClick: c => c() },
       { label: t('fl.sit'), primary: true, onClick: c => { c(); const s = SPOTS.find(q => q.kind === 'game' && q.game === a.game && Math.hypot(q.x - a.x, q.y - a.y) < 5 * T); if (s) { if (Math.hypot(you.x - s.x, you.y - s.y) < 1.5 * T) enterGame(gid, s); else go(s); } } }
@@ -1485,7 +1491,7 @@
     if (p.kind === 'npc') {
       const a = p.npc, P = a.persona && Engines.Brain.PERSONAS[a.persona];
       el.querySelector('b').textContent = a.tag ? a.tag.name : P ? (P.name[I18N.lang] || P.name.en) : t('npc.' + (a.talk || 'walk'));
-      el.querySelector('small').textContent = a.tag ? a.tag.sub || '' : P ? t('game.' + (a.game === 'vip' ? 'zhajinhua' : a.game)) : '';
+      el.querySelector('small').textContent = a.tag ? a.tag.sub || '' : P ? t('game.' + gameId(a.game)) : '';
       el.querySelector('.fp-go').innerHTML = t('fl.talk') + key;
     } else {
       el.querySelector('b').textContent = spotName(p);

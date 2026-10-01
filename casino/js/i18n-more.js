@@ -17,6 +17,8 @@
     'zj.blind': '闷', 'zj.seen': '已看', 'zj.folded': '弃牌', 'zj.dealer': '庄', 'zj.called': '跟 {n}', 'zj.raised': '加注 ×{m}',
     'zj.lap': '第 {n}/{m} 轮 · 单注 ×{u}', 'zj.idle': '选好底注，开局', 'zj.youHave': '你的牌：{c}', 'zj.blindHint': '你在闷牌：不看牌跟注只要一半价钱。想看就点「看牌」。',
     'zj.pick': '点一位对手和他比牌', 'zj.vs': '比 牌', 'zj.cmpWin': '{who} 比赢了', 'zj.showdown': '开 牌', 'zj.winBy': '{who} 赢下底池 {c}',
+    'zj.rake': '抽水 {n}', 'game.vipzjh': '贵宾厅炸金花', 'tag.vipzjh': '4 人私人局 · 底注 1,000 起 · 赌神坐镇', 'lobby.rake': '对战 · 抽水 5%', 'lobby.vip': '贵宾',
+    'vip.gateT': '贵宾厅', 'vip.gate': '贵宾厅只对金卡以上会员，或携带 200,000 以上筹码的客人开放。', 'vip.introT': '赌神', 'vip.intro': '坐。这张桌子不看运气，只看谁先眨眼。', 'vip.terms': '底注 1,000 起 · 抽水 5%（封顶 10 倍底注）', 'vip.sit': '入座', 'vip.who': '高进 · 人称赌神',
     'zj.stakeHint': '底注越大，跟注和加注越贵。新手建议 10 或 50。',
     'zj.rules': `<p><b>一句话：</b>每人三张牌，比谁大。你可以不看牌（闷）也可以看牌，靠下注和嘴上功夫把别人吓走，最后剩下的人或比牌赢的人拿走整个底池。</p>
       <h3>牌型（从大到小）</h3><ol><li><b>豹子</b> 三张一样，如 AAA</li><li><b>顺金</b> 同花色的顺子，如 ♥4 5 6</li><li><b>金花</b> 三张同花色</li><li><b>顺子</b> 三张连号，A23 最小，QKA 最大</li><li><b>对子</b> 两张一样</li><li><b>单张</b> 比最大那张</li></ol>
@@ -87,6 +89,8 @@
     'zj.blind': 'Blind', 'zj.seen': 'Seen', 'zj.folded': 'Folded', 'zj.dealer': 'D', 'zj.called': 'Call {n}', 'zj.raised': 'Raise ×{m}',
     'zj.lap': 'Lap {n}/{m} · unit ×{u}', 'zj.idle': 'Pick a stake and deal', 'zj.youHave': 'Your hand: {c}', 'zj.blindHint': 'You are playing blind: calls cost half while you have not looked. Tap Look to see your cards.',
     'zj.pick': 'Tap an opponent to compare hands', 'zj.vs': 'SHOWDOWN', 'zj.cmpWin': '{who} wins the compare', 'zj.showdown': 'SHOWDOWN', 'zj.winBy': '{who} takes the pot {c}',
+    'zj.rake': 'Rake {n}', 'game.vipzjh': 'VIP Brag', 'tag.vipzjh': '4-seat private game · antes from 1,000 · the God of Gamblers', 'lobby.rake': 'PvP · 5% rake', 'lobby.vip': 'VIP',
+    'vip.gateT': 'VIP salon', 'vip.gate': 'The VIP salon is open to Gold members and above, or guests carrying 200,000 chips or more.', 'vip.introT': 'God of Gamblers', 'vip.intro': 'Sit. Luck doesn\'t play at this table. Only who blinks first.', 'vip.terms': 'Antes from 1,000 · 5% rake (capped at 10 antes)', 'vip.sit': 'Take a seat', 'vip.who': 'Ko Chun · the God of Gamblers',
     'zj.stakeHint': 'Bigger antes make every call and raise pricier. New players: try 10 or 50.',
     'zj.rules': `<p><b>In one line:</b> three cards each, best hand wins. Play blind or look, push others out with bets and table talk; the last player standing, or the winner of a compare, takes the whole pot.</p>
       <h3>Hands (high to low)</h3><ol><li><b>Trips</b> three of a kind, e.g. AAA</li><li><b>Straight flush</b> e.g. ♥4 5 6</li><li><b>Flush</b> three of one suit</li><li><b>Straight</b> three in a row; A23 lowest, QKA highest</li><li><b>Pair</b></li><li><b>High card</b></li></ol>

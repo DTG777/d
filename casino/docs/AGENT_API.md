@@ -97,6 +97,22 @@ await Casino.play('blackjack', obs =>
   : obs.hands[obs.active].total < 17 ? { type: 'hit' } : { type: 'stand' }, { rounds: 20 });
 ```
 
+### The rest of the building
+
+The floor, its services, the debt story and the lottery each expose a small object, so an agent can live a whole night in the casino:
+
+| call | what it does |
+|---|---|
+| `Floor.spots()` / `Floor.where()` / `Floor.goto(gameOrService)` | the walkable floor: every table and counter, where you are, walk somewhere |
+| `Services.open(id)` | open a counter (`bar`, `restaurant`, `hotel`, `cage`, `club`, `lottery`, `scratch`, …) |
+| `Services.vit()` / `tier()` / `night()` / `comp()` | energy and tipsiness, players-club tier, tonight's theoretical loss and net, comp points |
+| `Services.edge(id)` | the house edge the ledger books for a game |
+| `Story.state()` | opening, credit, net worth, every open loan with what is owed and days late |
+| `Story.borrow(src, amount)` / `Story.repay(loanId)` | borrow from `marker`, `junket` or a loan app; repay one loan in full |
+| `Story.achievements()` / `Story.endings()` | what this browser has unlocked |
+| `Lottery.games()` / `rtp(g)` / `odds(g)` / `jackpot(g)` | draw games with their exact top-prize odds and long-run return |
+| `Lottery.play(g, { lines, draws })` / `Lottery.scratch(cardId)` | buy quick picks and settle at once / buy and scratch one card |
+
 ---
 
 ## 4. Function-calling tools
@@ -122,7 +138,15 @@ Illegal actions come back as `{ ok: false, error }` with the rule that was broke
 
 ## 5. Opponents: scripted personas and language models
 
-Six house personas sit at the card-room tables (炸金花, 牛牛, 斗地主, 麻将):
+Eleven house personas sit at the card-room tables. Each table has its regulars (`Casino.LINEUP`):
+
+| table | regulars |
+|---|---|
+| `zhajinhua` 炸金花 (5 seats, 5% rake) | hao, mei, fei, zhou |
+| `vipzjh` 贵宾厅炸金花 (4 seats, antes 1,000–20,000, 5% rake) | ace, chen, yan |
+| `niuniu` 牛牛 | hao, chen, dao, ling |
+| `doudizhu` 斗地主 | oldk, wang |
+| `mahjong` 麻将 | wang, ling, oldk |
 
 | id | name | style |
 |---|---|---|
@@ -130,8 +154,15 @@ Six house personas sit at the card-room tables (炸金花, 牛牛, 斗地主, �
 | `ling` | 玲姐 Ling | reads people, sharp tongue |
 | `oldk` | 老K Old K | old Macau hand, calm |
 | `mei` | 小美 Mei | plays the giggly beginner; isn't one |
-| `ace` | 赌神 Ace | few words, cold |
-| `fei` | 大飞 Fei | tilts after two losses |
+| `ace` | 赌神 Ace | `god`: disciplined pot-odds play, long blind runs, wins over time |
+| `fei` | 大飞 Fei | `tilt`: chases after two losses |
+| `dao` | 刀仔 Knife | `pro`: same math as Ace, fewer words |
+| `wang` | 王阿姨 Auntie Wang | `lucky`: superstitious and tight |
+| `chen` | 陈总 Boss Chen | `boss`: insolvent chairman, raises to save face |
+| `zhou` | 小周 Zhou | `tilt`: student on loan apps |
+| `yan` | 燕姐 Madam Yan | `junket`: the VIP salon's credit agent |
+
+House wallets persist between visits; VIP seats start with 5,000,000. The 炸金花 tables take 5% of every contested pot, capped at 10 antes; the `win` event carries `pot` (after rake) and `rake`.
 
 **`Brain.scripted(game, persona)`**
 

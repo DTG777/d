@@ -6,7 +6,8 @@
   const PRIZE_W = [14, 9, 14, 5, 14, 2.5, 14, 9, 11, 1, 14, 0.4];
 
   const GAMES = [
-    { id: 'zhajinhua', sec: 'cardroom', ai: true, hot: true },
+    { id: 'zhajinhua', sec: 'cardroom', ai: true, hot: true, rake: true },
+    { id: 'vipzjh', sec: 'cardroom', ai: true, vip: true, rake: true },
     { id: 'doudizhu', sec: 'cardroom', ai: true },
     { id: 'mahjong', sec: 'cardroom', ai: true },
     { id: 'niuniu', sec: 'cardroom', ai: true },
@@ -49,6 +50,8 @@
         ${[[30, 62], [130, 62], [22, 38], [138, 38]].map(([x, y]) => `<svg x="${x - 12}" y="${y - 12}" width="24" height="24" viewBox="0 0 100 100"><use href="#tb-9"/></svg>`).join('')}</svg>`;
       case 'zhajinhua': return `<svg viewBox="0 0 160 100">${card(56, 54, -16, 'A', '♠', 0)}${card(80, 50, 0, 'A', '♥', 1)}${card(104, 54, 16, 'A', '♦', 1)}
         <text x="80" y="96" text-anchor="middle" font-family="'ZCOOL QingKe HuangYou', sans-serif" font-size="16" fill="#f6c94e">豹子</text></svg>`;
+      case 'vipzjh': return `<svg viewBox="0 0 160 100"><circle cx="80" cy="50" r="46" fill="none" stroke="#f6c94e" stroke-opacity=".25"/>${card(56, 52, -16, 'A', '♠', 0)}${card(80, 48, 0, 'K', '♠', 0)}${card(104, 52, 16, 'Q', '♠', 0)}
+        <text x="80" y="96" text-anchor="middle" font-family="'ZCOOL QingKe HuangYou', sans-serif" font-size="16" fill="#ffe08a" letter-spacing="4">赌神</text></svg>`;
       case 'niuniu': return `<svg viewBox="0 0 160 100">${[['K', '♠', 0], ['Q', '♥', 1], ['J', '♣', 0], ['T', '♦', 1], ['K', '♥', 1]].map(([r, su, red], i) => card(40 + i * 20, 52, (i - 2) * 8, r === 'T' ? '10' : r, su, red)).join('')}
         <text x="80" y="97" text-anchor="middle" font-family="'ZCOOL QingKe HuangYou', sans-serif" font-size="17" fill="#f6c94e">五花牛</text></svg>`;
       case 'doudizhu': return `<svg viewBox="0 0 160 100">${card(64, 46, -10, '2', '♠', 0)}
@@ -146,7 +149,7 @@
             <div class="tile-info">
               <div class="tile-name" data-i18n="game.${g.id}">${t('game.' + g.id)}</div>
               <div class="tile-tag" data-i18n="tag.${g.id}">${t('tag.' + g.id)}</div>
-              <div class="tile-meta">${g.rtp ? `<span class="rtp">RTP ${g.rtp}</span>` : `<span class="rtp" data-i18n="lobby.noRake">${t('lobby.noRake')}</span>`}${g.ai ? `<span class="ai-badge" data-i18n="lobby.withAI">${t('lobby.withAI')}</span>` : ''}${g.hot ? `<span class="hot" data-i18n="lobby.hot">${t('lobby.hot')}</span>` : ''}</div>
+              <div class="tile-meta">${g.rtp ? `<span class="rtp">RTP ${g.rtp}</span>` : `<span class="rtp" data-i18n="lobby.${g.rake ? 'rake' : 'noRake'}">${t(g.rake ? 'lobby.rake' : 'lobby.noRake')}</span>`}${g.vip ? `<span class="vip-badge" data-i18n="lobby.vip">${t('lobby.vip')}</span>` : ''}${g.ai ? `<span class="ai-badge" data-i18n="lobby.withAI">${t('lobby.withAI')}</span>` : ''}${g.hot ? `<span class="hot" data-i18n="lobby.hot">${t('lobby.hot')}</span>` : ''}</div>
             </div>
           </a>`).join('')}
       </div>`).join('')}
