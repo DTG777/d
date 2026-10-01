@@ -493,7 +493,7 @@
   }
 
   /* ---------------- achievements ---------------- */
-  const ACH = ['first_loan', 'marker', 'junket', 'all_apps', 'juggle', 'usury', 'million', 'collector', 'exposed', 'extended', 'atm3', 'bank0', 'work', 'manhan', 'tower', 'white', 'whale', 'free10', 'wish10', 'limit', 'dawn', 'nights3', 'walk'];
+  const ACH = ['first_loan', 'marker', 'junket', 'all_apps', 'juggle', 'usury', 'million', 'collector', 'exposed', 'extended', 'atm3', 'bank0', 'work', 'manhan', 'tower', 'white', 'whale', 'free10', 'wish10', 'limit', 'dawn', 'nights3', 'walk', 'lotto'];
   const HIDDEN = ['juggle', 'usury', 'exposed', 'extended', 'bank0', 'limit', 'walk'];
   function ach(k) {
     if (META.ach[k]) return;
@@ -512,6 +512,7 @@
     if (kind === 'free' && arg >= 10) ach('free10');
     if (kind === 'wish' && ++wishes >= 10) ach('wish10');
     if (kind === 'limit') ach('limit');
+    if (kind === 'lotto' && arg >= 100) ach('lotto');
     if (kind === 'night' && R) { R.nights = (R.nights || 0) + 1; if (R.nights >= 3) ach('nights3'); save(); }
     sync();
   }

@@ -100,6 +100,7 @@
     'st.a.dawn': '天亮了', 'st.ad.dawn': '在赌场里看到早上六点。',
     'st.a.nights3': '老熟人', 'st.ad.nights3': '在赌场度过三个夜晚。',
     'st.a.walk': '赢了就走', 'st.ad.walk': '赢了一万以上，然后离开。',
+    'st.a.lotto': '守号', 'st.ad.lotto': '同一组号码一口气买 100 期。',
     'st.hidden': '隐藏成就', 'st.unlocked': '成就解锁',
 
     'st.e.ashore': '上岸', 'st.es.ashore': '你还清了每一分钱，然后走出了大门。',
@@ -246,6 +247,7 @@
     'st.a.dawn': 'Daybreak', 'st.ad.dawn': 'Saw 6 AM inside the casino.',
     'st.a.nights3': 'Familiar face', 'st.ad.nights3': 'Spent three nights at the casino.',
     'st.a.walk': 'Win and walk', 'st.ad.walk': 'Won more than 10,000 and left.',
+    'st.a.lotto': 'Same numbers, every draw', 'st.ad.lotto': 'Bought the same numbers for 100 draws in one go.',
     'st.hidden': 'Hidden achievement', 'st.unlocked': 'Achievement unlocked',
 
     'st.e.ashore': 'Ashore', 'st.es.ashore': 'You paid back every cent and walked out the door.',

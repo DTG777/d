@@ -12,7 +12,7 @@
   const saveN = () => LS.set('night', N);
 
   /* ---------------- the house edge, per game ---------------- */
-  const EDGE = { slots: 0.05, classic: 0.046, caishen: 0.04, treasure: 0.05, blackjack: 0.006, roulette: 0.027, baccarat: 0.011, sicbo: 0.028, crash: 0.03, plinko: 0.01 };
+  const EDGE = { slots: 0.05, classic: 0.046, caishen: 0.04, treasure: 0.05, blackjack: 0.006, roulette: 0.027, baccarat: 0.011, sicbo: 0.028, crash: 0.03, plinko: 0.01, lottery: 0.5, scratch: 0.37 };
   const edge = id => EDGE[id] || 0;
   const TIERS = [0, 500, 5000, 50000, 500000];
   const COLORS = ['#9aa7a0', '#d8dde4', '#f6c94e', '#e6ecf2', '#20232a'];

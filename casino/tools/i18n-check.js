@@ -74,6 +74,15 @@ for (let i = 1; i <= 3; i++) keys.add('st.junket.hi.' + i);
 ['demo', 'rich'].forEach(k => keys.add('st.fam.' + k));
 ['has', 'credit', 'multi', 'max'].forEach(k => keys.add('st.rej.' + k));
 ['msgs', 'bills', 'bank', 'ach', 'ends', 'life', 'loans'].forEach(k => keys.add('st.app.' + k));
+// lottery: games, scratch cards, tabs, table columns
+const LT = fs.readFileSync(path.join(__dirname, '../js/lottery.js'), 'utf8');
+const ltKeys = name => [...LT.match(new RegExp('const ' + name + ' = \\{([\\s\\S]*?)\\n  \\};'))[1].matchAll(/^    (\w+): \{ reg: '\w+', (?:kind: '(\w+)')?/gm)].map(m => [m[1], m[2]]);
+ltKeys('GAMES').forEach(([g, kind]) => { ['g', 'gs', 'how'].forEach(p => keys.add(`lt.${p}.${g}`)); if (kind === 'pool') ['a', 'b'].forEach(p => keys.add(`lt.${p}.${g}`)); });
+ltKeys('CARDS').forEach(([c]) => ['c', 'cs'].forEach(p => keys.add(`lt.${p}.${c}`)));
+['cn', 'us', 'scratch'].forEach(k => keys.add('lt.tab.' + k));
+[0, 1, 2].forEach(i => keys.add('lt.pos.' + i));
+['tier', 'match', 'odds', 'prize'].forEach(k => keys.add('lt.col.' + k));
+['match3', 'numbers'].forEach(k => keys.add('lt.scr.rule.' + k));
 let bad = 0;
 for (const k of [...keys].filter(k => !k.endsWith('.'))) for (const l of ['zh', 'en']) if (D[l][k] == null) { console.log('missing', l, k); bad++; }
 for (const k of Object.keys(D.zh)) if (D.en[k] == null) { console.log('en lacks', k); bad++; }
