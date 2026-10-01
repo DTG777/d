@@ -1,7 +1,7 @@
 # 金玉满堂 · Gold & Jade Casino
 
-七款经典赌场游戏，全部使用**虚拟筹码**：没有充值，没有兑现，没有真钱。
-Seven classic casino games played with **virtual chips only**. Nothing to buy, nothing to cash out.
+棋牌室对战加经典赌场游戏，全部使用**虚拟筹码**：没有充值，没有兑现，没有真钱。
+Card-room games against talking opponents plus classic casino games, all with **virtual chips only**. Nothing to buy, nothing to cash out.
 
 ## 运行 / Run
 
@@ -13,6 +13,20 @@ cd casino && python3 -m http.server 8000   # http://localhost:8000
 ```
 
 ## 游戏 / Games
+
+### 棋牌室 / Card room (PvP, no rake)
+
+对手是六位有性格的牌友（阿豪、玲姐、老K、小美、赌神、大飞），会吹牛、会诈唬、会回嘴。每局结束后，亮出的牌会揭穿谁刚才在诈。可以在设置里接入大模型，让它坐上对手的位置。
+Six opponents with personalities bluff, needle and answer back. After each hand, the shown cards expose who was bluffing. In Settings you can let a language model take their seats (see [docs/AGENT_API.md](docs/AGENT_API.md)).
+
+| 游戏 | Game | 规则 / Rules |
+|---|---|---|
+| 炸金花 | Zha Jin Hua | 5 人、闷牌/看牌、跟注、加注、比牌，豹子 > 顺金 > 金花 > 顺子 > 对子，235 吃豹子 |
+| 斗地主 | Dou Di Zhu | 叫分抢地主、炸弹与王炸翻倍、春天，选牌出牌带提示 |
+| 血战麻将 | Sichuan Mahjong | 定缺、碰、杠（刮风下雨）、自摸、点炮，血战到底，番型结算 |
+| 抢庄牛牛 | Niu Niu | 抢庄倍数、下注倍数、自动拆牛，五花牛、炸弹牛、五小牛 |
+
+### 赌场 / Casino
 
 | 游戏 | Game | 亮点 / Highlights | RTP |
 |---|---|---|---|
@@ -44,11 +58,24 @@ js/i18n.js          中英文字典
 js/audio.js         合成音效、音乐、语音
 js/fx.js            粒子、飞币、震屏、大奖演出
 js/core.js          钱包、等级、筹码/下注板/扑克牌组件、路由
-js/games/*.js       七个游戏
+js/engine/*.js      纯规则引擎（无 DOM）：每个游戏的 init/legal/step/view，AI 工具，性格化对手 Brain
+js/casino-api.js    window.Casino：画面与 AI 共用的实时接口
+js/games/*.js       各游戏画面
 js/main.js          大厅、幸运转盘、设置、启动
+docs/AGENT_API.md   AI 接入文档 / how agents and language models join the tables
+tools/llm-agent.js  命令行里让大模型上桌：node tools/llm-agent.js table zhajinhua
 tools/sim.js        老虎机与弹珠台的 RTP 模拟：node tools/sim.js
 tools/i18n-check.js 校验两种语言的文案键是否齐全
 ```
+
+## AI 对手 / AI opponents
+
+- 默认对手是脚本人格：打法随性格变化，台词按局势触发，诈唬会被记录，亮牌后揭穿。
+  By default, opponents are scripted personas. Their play follows their personality, they talk according to the situation, and their bluffs are recorded and exposed when cards are shown.
+- 接入大模型后，它每回合给出 `{think, action, say}`。它会骗你，而你能在局后看到它当时真正在想什么（紫色）。动作会先过一遍合法性校验，出错就回退到脚本，所以牌局不会卡住。
+  With a language model, each turn returns `{think, action, say}`. It may lie to you, and after the hand you see what it was really thinking (in purple). Every action is validated against the rules, and on failure the seat falls back to its script, so the table never stalls.
+- 密钥只存在你自己浏览器的 localStorage，或命令行的环境变量里，**不要提交进仓库**。
+  The key lives only in your browser's localStorage or in your shell environment. **Never commit it.**
 
 进度保存在浏览器 localStorage 中，可在设置里一键重置。
 Progress is stored in localStorage and can be reset from Settings.

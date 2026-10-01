@@ -222,6 +222,8 @@
       ].filter(Boolean).join('\n\n');
     };
     const policy = async obs => {
+      // nothing to decide (deal the next hand, the only move left): no need to ask the model
+      if (obs.legal.length === 1 && !Object.keys(obs.legal[0].params || {}).length) return fallback(obs);
       const user = 'Observation:\n' + JSON.stringify(compactObs(obs));
       let messages = [{ role: 'user', content: user }];
       for (let attempt = 0; attempt < 2; attempt++) {

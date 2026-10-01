@@ -1,5 +1,5 @@
 /* Agent kit: everything an AI player needs, shared by the browser (window.Casino)
-   and node (tools/llm-agent.js, tools/agent-sim.js).
+   and node (tools/llm-agent.js).
 
    - describe(id)       full machine-readable rules of a game
    - actionSchema(spec) JSON Schema for one legal action, oneOf for a list
