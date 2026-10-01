@@ -82,7 +82,7 @@
     if (V.limit && -net() >= V.limit && !N.limitHit) {
       N.limitHit = 1; saveN();
       setTimeout(() => C.modal({ title: t('sv.lim.hit'), body: U.h('p', null, t('sv.lim.hitB', { n: U.fmt(-net()) })), actions: [
-        { label: t('sv.lim.go'), primary: true, onClick: c => { c(); C.go('lobby'); setTimeout(() => window.Floor && Floor.goto('exit'), 400); } },
+        { label: t('sv.lim.go'), primary: true, onClick: c => { c(); story('limit'); C.go('lobby'); setTimeout(() => window.Floor && Floor.goto('exit'), 400); } },
         { label: t('sv.lim.stay') }] }), 1400);
     }
   }
@@ -106,6 +106,7 @@
   }
 
   /* ---------------- shared sheet UI ---------------- */
+  const story = (k, a) => { if (window.Story && Story.event) Story.event(k, a); };
   const fmtP = p => p ? U.fmt(p) : t('sv.free');
   function sheet(kind, title, intro, items, buy, extra) {
     const grid = U.h('div', { class: 'sv-grid' });
@@ -228,6 +229,7 @@
       if (it.id === 'tower') { if (window.Floor) Floor.crowd(14); setTimeout(() => Sound.fx.cheer(1.4), 900); setTimeout(() => FX.confetti(innerWidth / 2, innerHeight * 0.4, 90), 1800); }
       await stage('sv-pour' + (it.id === 'tower' ? ' tower' : '') + (it.lux ? ' lux' : ''), `<div class="sv-glass">${glass(it.g[0], it.g[1])}</div>`, t('sv.d.' + it.id), it.d > 0 ? t('sv.drank') : t('sv.sober'), it.id === 'tower' ? 4200 : 2400);
       drink(it.d, it.e || 0);
+      story('drink', it.id);
     });
   }
   function drink(d, e = 0) {
@@ -243,7 +245,7 @@
     const body = U.h('div', { class: 'sv sv-free' },
       U.h('p', null, t(N.free >= 2 ? 'sv.free.again' : 'sv.free.intro')),
       U.h('div', { class: 'sv-row' }, opts.map(d => U.h('button', { class: 'sv-mini', onclick: () => {
-        close(); N.free++; V.free++;
+        close(); N.free++; V.free++; story('free', V.free);
         Sound.fx.glass(); drink(d.d, d.e || 0);
         if (window.Floor) { Floor.say('you', t('sv.free.thanks')); if (w) setTimeout(() => Floor.say(w, t('sv.free.enjoy')), 900); }
         if (N.free === 3) setTimeout(() => C.modal({ title: t('sv.free.why'), body: U.h('p', null, t('sv.free.whyB')), actions: [{ label: t('sv.ok'), primary: true }] }), 1200);
@@ -413,6 +415,7 @@
     Sound.fx.coin(1.2); setTimeout(() => Sound.fx.splash(), 380);
     if (window.Floor) Floor.coins(6);
     const lucky = Math.random() < 0.01;
+    story('wish');
     setTimeout(() => {
       if (lucky) { C.pay(500, null, false); C.toast(t('sv.wish.lucky'), 'good'); Sound.fx.win(1); }
       else C.toast(t('sv.wish.' + U.randInt(1, 6)));
@@ -457,10 +460,12 @@
     if (window.Floor) Floor.stop();
     const m = ((V.min % 1440) + 1440) % 1440;
     await night(t(m < 600 ? 'sv.dawn' : 'sv.home'), t(n < 0 ? 'sv.dawn.lost' : 'sv.dawn.won', { n: U.fmt(Math.abs(n)) }), 4200);
-    if (window.Story && Story.onExit) Story.onExit({ net: n, theo: N.theo });
+    const r = window.Story && Story.onExit ? await Story.onExit({ net: n, theo: N.theo }) : null;
     V.min += m < 600 ? 1200 - m : 2640 - m;            // sleep at home, back at 20:00
     V.energy = 100; V.drunk = 0; V.nights++; save();
     N = fresh(); saveN();
+    story('night', V.nights);
+    if (r === 'end') return;
     if (window.Floor) { try { sessionStorage.removeItem('gj_in'); } catch (e) { /* ignore */ } Floor.enter(); }
   }
 
@@ -502,6 +507,8 @@
     night: () => ({ theo: N.theo, net: net(), mins: (Date.now() - N.t0) / 60000, drinks: N.drinks }),
     life: () => V.life,
     drink, stage, nightScene: night,
-    energize(n) { V.energy = U.clamp(V.energy + n, 0, 100); save(); }
+    energize(n) { V.energy = U.clamp(V.energy + n, 0, 100); save(); },
+    // a new life: fresh night, rested, sober; the club and wardrobe stay with the player
+    reset() { V.energy = 100; V.drunk = 0; V.min = Math.max(V.min, 0); N = fresh(); saveN(); save(); }
   };
 })();

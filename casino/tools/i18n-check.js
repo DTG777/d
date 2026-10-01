@@ -55,6 +55,25 @@ for (const [list, a, b] of [['FOOD', 'f', 'fd'], ['BAR', 'd', 'dd'], ['ROOMS', '
 for (let i = 0; i < 5; i++) { keys.add('sv.tier.' + i); keys.add('sv.perk.' + i); }
 for (let i = 1; i <= 6; i++) keys.add('sv.wish.' + i);
 ['water', 'pour'].forEach(k => keys.add('sv.bt.' + k));
+// story: openings, lenders, people, achievements, endings
+const ST = fs.readFileSync(path.join(__dirname, '../js/story.js'), 'utf8');
+const listOf = name => ST.match(new RegExp('const ' + name + ' = \\[([^\\]]*)\\]'))[1].match(/'(\w+)'/g).map(s => s.slice(1, -1));
+const keysOf = name => [...ST.match(new RegExp('const ' + name + ' = \\{([\\s\\S]*?)\\n  \\};'))[1].matchAll(/^\s+(\w+): \{/gm)].map(m => m[1]);
+const OPS = keysOf('OPS'), APPS = keysOf('APPS');
+OPS.forEach(k => { ['op', 'opd', 'goal'].forEach(p => keys.add(`st.${p}.${k}`)); for (let i = 1; i <= 3; i++) keys.add(`st.pro.${k}.${i}`); });
+APPS.forEach(k => ['src', 'slogan', 'rate', 'who'].forEach(p => keys.add(`st.${p}.${k}`)));
+['marker', 'junket'].forEach(k => keys.add('st.src.' + k));
+listOf('WHO').forEach(w => keys.add('st.who.' + w));
+['family', 'friend', 'bank', 'casino', 'junket', 'collector'].forEach(w => keys.add('st.g.' + w));
+['family', 'friend', 'junket', 'collector'].forEach(w => { for (let i = 1; i <= 3; i++) { keys.add(`st.re.${w}.${i}`); keys.add(`st.q.${w}.${i}`); } });
+listOf('ACH').forEach(k => { keys.add('st.a.' + k); keys.add('st.ad.' + k); });
+listOf('ENDS').forEach(k => ['e', 'es', 'e.hint', 'eb'].forEach(p => keys.add(`st.${p}.${k}`)));
+['ashore', 'walkaway'].forEach(k => { keys.add('st.offer.' + k); keys.add('st.offerB.' + k); });
+for (let i = 1; i <= 4; i++) keys.add('st.ad.' + i);
+for (let i = 1; i <= 3; i++) keys.add('st.junket.hi.' + i);
+['demo', 'rich'].forEach(k => keys.add('st.fam.' + k));
+['has', 'credit', 'multi', 'max'].forEach(k => keys.add('st.rej.' + k));
+['msgs', 'bills', 'bank', 'ach', 'ends', 'life', 'loans'].forEach(k => keys.add('st.app.' + k));
 let bad = 0;
 for (const k of [...keys].filter(k => !k.endsWith('.'))) for (const l of ['zh', 'en']) if (D[l][k] == null) { console.log('missing', l, k); bad++; }
 for (const k of Object.keys(D.zh)) if (D.en[k] == null) { console.log('en lacks', k); bad++; }

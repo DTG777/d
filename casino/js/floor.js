@@ -1038,6 +1038,7 @@
   function talkTo(a) {
     a.dir = faceTo(a, you); you.dir = faceTo(you, a);
     const k = a.talk;
+    if (a.onTalk) return a.onTalk(a);
     if (a.persona) return persona(a);
     if (k === 'guard') return guardTalk();
     if (k === 'waitress') return offerDrink(a);
@@ -1364,9 +1365,9 @@
     g.textAlign = 'center'; g.textBaseline = 'middle';
     // regulars' names
     for (const a of ACT) {
-      if (!a.persona || !near(a, 9)) continue;
-      const P = Engines.Brain.PERSONAS[a.persona], [sx, sy] = toScreen(a.x, a.y - 50);
-      const n = P.name[I18N.lang] || P.name.en;
+      if (!(a.persona || a.tag) || !near(a, 9)) continue;
+      const P = a.tag || Engines.Brain.PERSONAS[a.persona], [sx, sy] = toScreen(a.x, a.y - 50);
+      const n = a.tag ? a.tag.name : P.name[I18N.lang] || P.name.en;
       g.font = `800 11px ${FONT}`; const tw = g.measureText(n).width + 12;
       g.fillStyle = 'rgba(6,3,2,.8)'; rr(sx - tw / 2, sy - 8, tw, 16, 8); g.fill(); g.strokeStyle = P.color; g.lineWidth = 1; g.stroke();
       g.fillStyle = P.color; g.fillText(n, sx, sy);
@@ -1483,8 +1484,8 @@
     const key = matchMedia('(pointer: fine)').matches ? ' <kbd>E</kbd>' : '';
     if (p.kind === 'npc') {
       const a = p.npc, P = a.persona && Engines.Brain.PERSONAS[a.persona];
-      el.querySelector('b').textContent = P ? (P.name[I18N.lang] || P.name.en) : t('npc.' + (a.talk || 'walk'));
-      el.querySelector('small').textContent = P ? t('game.' + (a.game === 'vip' ? 'zhajinhua' : a.game)) : '';
+      el.querySelector('b').textContent = a.tag ? a.tag.name : P ? (P.name[I18N.lang] || P.name.en) : t('npc.' + (a.talk || 'walk'));
+      el.querySelector('small').textContent = a.tag ? a.tag.sub || '' : P ? t('game.' + (a.game === 'vip' ? 'zhajinhua' : a.game)) : '';
       el.querySelector('.fp-go').innerHTML = t('fl.talk') + key;
     } else {
       el.querySelector('b').textContent = spotName(p);
