@@ -7,6 +7,7 @@ global.window = global;
 require('../js/i18n.js');
 require('../js/i18n-more.js');
 require('../js/i18n-tut.js');
+require('../js/i18n-slots.js');
 const D = I18N._dict;
 const files = ['js/core.js', 'js/fx.js', 'js/main.js', 'js/tutorial.js', ...fs.readdirSync(path.join(__dirname, '../js/games')).map(f => 'js/games/' + f)];
 const keys = new Set();
@@ -15,10 +16,10 @@ for (const f of files) {
   for (const m of src.matchAll(/(?:\bt|I18N\.t)\(\s*'([\w.]+)'/g)) keys.add(m[1]);
   for (const m of src.matchAll(/data-i18n(?:-aria)?="([\w.]+)"/g)) keys.add(m[1]);
   for (const m of src.matchAll(/key: '([\w.]+)'/g)) if (m[1].includes('.')) keys.add(m[1]);
-  for (const m of src.matchAll(/'((?:tut|aca|bjc)\.[\w.]+)'/g)) keys.add(m[1]);
+  for (const m of src.matchAll(/'((?:tut|aca|bjc|cl|cs|tb)\.[\w.]+)'/g)) keys.add(m[1]);
 }
 // dynamic keys
-['slots', 'blackjack', 'roulette', 'baccarat', 'sicbo', 'crash', 'plinko', 'zhajinhua', 'niuniu', 'doudizhu', 'mahjong'].forEach(g => { keys.add('game.' + g); keys.add('tag.' + g); });
+['slots', 'classic', 'caishen', 'treasure', 'blackjack', 'roulette', 'baccarat', 'sicbo', 'crash', 'plinko', 'zhajinhua', 'niuniu', 'doudizhu', 'mahjong'].forEach(g => { keys.add('game.' + g); keys.add('tag.' + g); });
 ['cherry', 'lemon', 'bell', 'bar', 'diamond', 'seven', 'wild', 'scatter'].forEach(s => keys.add('sym.' + s));
 ['red', 'black', 'green', 'doz1', 'doz2', 'doz3'].forEach(s => keys.add('rl.' + s));
 ['p', 'b', 't'].forEach(s => keys.add('bc.bead.' + s));
@@ -28,9 +29,13 @@ for (const f of files) {
 for (let i = 1; i <= 8; i++) keys.add('pv.q' + i);
 ['start', 'games', 'odds', 'words'].forEach(k => keys.add('aca.tab.' + k));
 ['start', 'odds', 'words'].forEach(k => keys.add('aca.' + k));
-['slots', 'blackjack', 'roulette', 'baccarat', 'sicbo', 'crash', 'plinko', 'zhajinhua', 'niuniu', 'doudizhu', 'mahjong'].forEach(g => keys.add('aca.g.' + g));
+['slots', 'classic', 'caishen', 'treasure', 'blackjack', 'roulette', 'baccarat', 'sicbo', 'crash', 'plinko', 'zhajinhua', 'niuniu', 'doudizhu', 'mahjong'].forEach(g => keys.add('aca.g.' + g));
 ['hit', 'stand', 'double', 'split'].forEach(a => keys.add('bj.' + a));
-const EN = require('../js/engine/core.js'); require('../js/engine/ddz.js'); require('../js/engine/mahjong.js');
+const EN = require('../js/engine/core.js'); require('../js/engine/ddz.js'); require('../js/engine/mahjong.js'); require('../js/engine/fortune7-math.js'); require('../js/engine/slots.js');
+Object.keys(EN.list.classic.PAY).forEach(k => keys.add('cl.k.' + k));
+EN.list.caishen.NAMES.forEach(n => keys.add('cs.sym.' + n));
+EN.list.treasure.NAMES.forEach(n => keys.add('tb.sym.' + n));
+['grand', 'major', 'minor', 'mini'].forEach(k => keys.add('tb.jp.' + k));
 Object.keys(EN.list.mahjong.FAN_NAME).forEach(f => keys.add('mj.f.' + f));
 for (const m of fs.readFileSync(path.join(__dirname, '../js/engine/ddz.js'), 'utf8').matchAll(/type: '(\w+)'/g)) if (!['play', 'pass', 'bid', 'start'].includes(m[1])) keys.add('dz.c.' + m[1]);
 let bad = 0;

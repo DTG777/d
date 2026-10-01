@@ -10,7 +10,10 @@
     { id: 'doudizhu', sec: 'cardroom', ai: true },
     { id: 'mahjong', sec: 'cardroom', ai: true },
     { id: 'niuniu', sec: 'cardroom', ai: true },
-    { id: 'slots', sec: 'slots', rtp: '≈ 95%', hot: true },
+    { id: 'caishen', sec: 'slots', rtp: '≈ 96%', hot: true },
+    { id: 'treasure', sec: 'slots', rtp: '≈ 95%+' },
+    { id: 'slots', sec: 'slots', rtp: '≈ 95%' },
+    { id: 'classic', sec: 'slots', rtp: '95.4%' },
     { id: 'blackjack', sec: 'tables', rtp: '≈ 99.4%' },
     { id: 'roulette', sec: 'tables', rtp: '97.3%' },
     { id: 'baccarat', sec: 'tables', rtp: '98.9%' },
@@ -31,6 +34,19 @@
       case 'slots': return `<svg viewBox="0 0 160 100"><rect x="14" y="18" width="132" height="64" rx="10" fill="#120b06" stroke="#d9a441" stroke-width="3"/>
         ${[0, 1, 2].map(i => `<rect x="${22 + i * 40}" y="25" width="36" height="50" rx="4" fill="#f7efdc"/><svg x="${24 + i * 40}" y="32" width="32" height="36" viewBox="0 0 100 100"><use href="#sym-5"/></svg>`).join('')}
         <path d="M14 50 h-6 M146 50 h6" stroke="#f6c94e" stroke-width="3"/></svg>`;
+      case 'classic': return `<svg viewBox="0 0 160 100"><rect x="20" y="16" width="108" height="68" rx="10" fill="#22262e" stroke="#aeb6c2" stroke-width="3"/>
+        ${[0, 1, 2].map(i => `<rect x="${28 + i * 32}" y="24" width="28" height="52" rx="3" fill="#f7efdc"/><svg x="${29 + i * 32}" y="36" width="26" height="28" viewBox="0 0 100 100"><use href="#sym-5"/></svg>`).join('')}
+        <path d="M24 50 h100" stroke="#e8364f" stroke-width="2.5"/>
+        <path d="M140 66 V30" stroke="#d8dce2" stroke-width="4" stroke-linecap="round"/><circle cx="140" cy="27" r="8" fill="#e8233f"/><circle cx="140" cy="68" r="6" fill="#aeb6c2"/></svg>`;
+      case 'caishen': return `<svg viewBox="0 0 160 100">
+        ${[[22, 60, 0], [46, 72, 1], [114, 72, 2], [138, 60, 3], [30, 26, 7], [130, 26, 6]].map(([x, y, s]) => `<svg x="${x - 13}" y="${y - 13}" width="26" height="26" viewBox="0 0 100 100"><use href="#cs-${s}"/></svg>`).join('')}
+        <svg x="48" y="8" width="64" height="64" viewBox="0 0 100 100"><use href="#cs-9"/></svg>
+        <svg x="64" y="66" width="32" height="32" viewBox="0 0 100 100"><use href="#cs-10"/></svg>
+        <text x="80" y="87" text-anchor="middle" font-family="'Barlow Semi Condensed', sans-serif" font-weight="800" font-size="12" fill="#fff3c0">×50</text></svg>`;
+      case 'treasure': return `<svg viewBox="0 0 160 100">
+        <rect x="34" y="6" width="92" height="18" rx="9" fill="#0a0403" stroke="#f6c94e"/><text x="80" y="19.5" text-anchor="middle" font-family="'Barlow Semi Condensed', sans-serif" font-weight="800" font-size="12" fill="#ffe08a" letter-spacing="2">GRAND</text>
+        <svg x="50" y="28" width="60" height="64" viewBox="0 0 100 100"><use href="#tb-8"/></svg>
+        ${[[30, 62], [130, 62], [22, 38], [138, 38]].map(([x, y]) => `<svg x="${x - 12}" y="${y - 12}" width="24" height="24" viewBox="0 0 100 100"><use href="#tb-9"/></svg>`).join('')}</svg>`;
       case 'zhajinhua': return `<svg viewBox="0 0 160 100">${card(56, 54, -16, 'A', '♠', 0)}${card(80, 50, 0, 'A', '♥', 1)}${card(104, 54, 16, 'A', '♦', 1)}
         <text x="80" y="96" text-anchor="middle" font-family="'ZCOOL QingKe HuangYou', sans-serif" font-size="16" fill="#f6c94e">豹子</text></svg>`;
       case 'niuniu': return `<svg viewBox="0 0 160 100">${[['K', '♠', 0], ['Q', '♥', 1], ['J', '♣', 0], ['T', '♦', 1], ['K', '♥', 1]].map(([r, su, red], i) => card(40 + i * 20, 52, (i - 2) * 8, r === 'T' ? '10' : r, su, red)).join('')}

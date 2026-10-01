@@ -16,6 +16,9 @@
       ['.tile-crash', 'tut.lobby.7'], ['#btn-settings', 'tut.lobby.8'], ['.academy-btn', 'tut.lobby.9'], [null, 'tut.lobby.10']
     ],
     slots: [['.reels-frame', 'tut.slots.1'], ['.bet-step', 'tut.slots.2'], ['.spin-btn', 'tut.slots.3'], ['.slot-toggles', 'tut.slots.4'], ['.slot-meter', 'tut.slots.5']],
+    classic: [['.cl-glass', 'tut.classic.1'], ['.cl-line', 'tut.classic.2'], ['.cl-lever', 'tut.classic.3'], ['.bet-step', 'tut.slots.2']],
+    caishen: [['.cs-board', 'tut.caishen.1'], [null, 'tut.caishen.2'], ['.buy-btn', 'tut.caishen.3'], ['.spin-btn', 'tut.slots.3']],
+    treasure: [['.tb-jp', 'tut.treasure.1'], ['.tb-reels', 'tut.treasure.2'], [null, 'tut.treasure.3'], ['.spin-btn', 'tut.slots.3']],
     blackjack: [['.bj-dealer', 'tut.blackjack.1'], ['.chips-row', 'tut.blackjack.2'], ['.bet-spot', 'tut.blackjack.3'], ['.b-deal', 'tut.blackjack.4'], [null, 'tut.blackjack.5']],
     roulette: [['.wheel-wrap', 'tut.roulette.1'], ['.rl-board-wrap', 'tut.roulette.2'], ['.chips-row', 'tut.roulette.3'], ['.b-spin', 'tut.roulette.4']],
     baccarat: [['.bc-sides', 'tut.baccarat.1'], ['.bc-bets', 'tut.baccarat.2'], ['.bc-under', 'tut.baccarat.3'], ['.b-deal', 'tut.baccarat.4']],
@@ -157,7 +160,7 @@
   }
 
   /* ---------- Casino 101 ---------- */
-  const LEVEL = { slots: 1, crash: 1, plinko: 1, roulette: 1, baccarat: 1, sicbo: 2, blackjack: 2, niuniu: 2, zhajinhua: 2, doudizhu: 3, mahjong: 4 };
+  const LEVEL = { slots: 1, classic: 1, treasure: 1, caishen: 1, crash: 1, plinko: 1, roulette: 1, baccarat: 1, sicbo: 2, blackjack: 2, niuniu: 2, zhajinhua: 2, doudizhu: 3, mahjong: 4 };
   function academy(tab = 'start') {
     const body = U.h('div', { class: 'aca' });
     const tabs = ['start', 'games', 'odds', 'words'];

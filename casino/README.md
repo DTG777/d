@@ -31,6 +31,9 @@ Six opponents with personalities bluff, needle and answer back. After each hand,
 | 游戏 | Game | 亮点 / Highlights | RTP |
 |---|---|---|---|
 | 发财777 | Fortune Sevens | 5×3、10 线、扩展百搭、红包免费旋转 ×3、第 5 轴悬念慢停、急停、自动、极速 | ≈ 95% |
+| 幸运777 | Lucky 777 | 经典 3 轴单线、可拖拽拉杆、亮灯赔率表、百搭 ×2、"差一点"提示 | 95.4%（精确枚举） |
+| 财神到 | God of Wealth | 6×5 任意位置 8 个即中、消除连锁、倍数球、财字散布触发免费旋转、购买免费旋转 | ≈ 96% |
+| 聚宝盆 | Treasure Bowl | 5×3 243 路、金币锁定重转 (Hold & Win)、四级奖池 GRAND/MAJOR/MINOR/MINI | ≈ 95% |
 | 21点 | Blackjack | 6 副牌、3:2、加倍、分牌、庄家偷看底牌、键盘 H/S/D/P | ≈ 99.4% |
 | 轮盘 | Roulette | Canvas 欧式轮盘，小球物理落点与开奖结果一致；手机上自动竖排 | 97.3% |
 | 百家乐 | Baccarat | 标准补牌规则、庄对/闲对、**拖拽咪牌**、珠盘路 | 98.9% |
