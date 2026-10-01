@@ -339,15 +339,19 @@
     const esc = v => String(v || '').replace(/[&"<>]/g, ch => ({ '&': '&amp;', '"': '&quot;', '<': '&lt;', '>': '&gt;' }[ch]));
     const body = U.h('div', { class: 'settings ai-set', html: `
       <p class="fine">${t('ai.lead')}</p>
+      ${c.proxy ? `<p class="ai-proxy">${t('ai.proxy', { m: esc(c.model) })}</p>` : ''}
       <label class="set-row" for="ai-on"><span>${t('ai.enable')}</span><span class="switch"><input type="checkbox" id="ai-on" ${c.enabled ? 'checked' : ''}><span class="sw"></span></span></label>
-      <label>${t('ai.base')}<input type="url" id="ai-base" placeholder="https://api.anthropic.com" value="${esc(c.baseURL)}" autocomplete="off" spellcheck="false"></label>
+      <label>${t('ai.base')}<input type="url" id="ai-base" placeholder="https://api.anthropic.com" value="${esc(c.proxy ? '' : c.baseURL)}" autocomplete="off" spellcheck="false"></label>
       <label>${t('ai.key')}<input type="password" id="ai-key" value="${esc(c.apiKey)}" autocomplete="off" spellcheck="false"></label>
       <label>${t('ai.model')}<input type="text" id="ai-model" placeholder="claude-sonnet-5-5" value="${esc(c.model)}" autocomplete="off" spellcheck="false"></label>
       <label>${t('ai.seats')}<select id="ai-seats">${[1, 2, 3, 4].map(n => `<option ${n === c.seats ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
       <div class="ai-row"><button class="btn btn-ghost btn-sm ai-test">${t('ai.test')}</button><span class="ai-status" aria-live="polite"></span></div>
       <p class="fine">${t('ai.note')}</p>` });
     const $ = s => body.querySelector(s);
-    const read = () => ({ enabled: $('#ai-on').checked, baseURL: $('#ai-base').value.trim().replace(/\/+$/, ''), apiKey: $('#ai-key').value.trim(), model: $('#ai-model').value.trim(), seats: +$('#ai-seats').value });
+    const read = () => {
+      const r = { enabled: $('#ai-on').checked, baseURL: $('#ai-base').value.trim().replace(/\/+$/, ''), apiKey: $('#ai-key').value.trim(), model: $('#ai-model').value.trim(), seats: +$('#ai-seats').value };
+      return Casino.ai.proxy() && !r.apiKey ? Object.assign(r, { proxy: true, baseURL: '' }) : r;
+    };
     C.modal({ title: t('ai.title'), body, actions: [{ label: t('ai.save'), primary: true, onClick: close => { Casino.ai.set(read()); C.toast(t('ai.saved'), 'good'); close(); } }] });
     $('.ai-test').onclick = async () => {
       const st = $('.ai-status'); st.className = 'ai-status'; st.textContent = t('ai.testing');
@@ -398,6 +402,7 @@
     });
     C.go(location.hash.slice(1) || 'lobby');
     document.body.classList.add('ready');
+    if (window.Casino && Casino.ai.detect) Casino.ai.detect();
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })();

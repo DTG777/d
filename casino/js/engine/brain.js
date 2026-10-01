@@ -239,7 +239,8 @@
     try {
       const res = await fetch(url, {
         method: 'POST', signal: ctl && ctl.signal,
-        headers: {
+        // through tools/serve.js (cfg.proxy) the key stays on the server and never enters the page
+        headers: cfg.proxy ? { 'content-type': 'application/json' } : {
           'content-type': 'application/json', 'anthropic-version': '2023-06-01',
           'x-api-key': cfg.apiKey, authorization: 'Bearer ' + cfg.apiKey,
           'anthropic-dangerous-direct-browser-access': 'true'

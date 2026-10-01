@@ -65,7 +65,7 @@
 
     'ai.title': 'AI 对手（大模型）', 'ai.lead': '把一位庄家对手交给真正的大语言模型：它会读规则、读牌桌、读你的聊天，决定怎么打，也会在聊天里诈你。不开也能玩，默认由脚本人设陪你打。',
     'ai.enable': '启用 AI 对手', 'ai.base': '接口地址 (Anthropic 兼容)', 'ai.key': 'API 密钥', 'ai.model': '模型', 'ai.seats': 'AI 座位数',
-    'ai.note': '密钥只保存在本设备的浏览器存储里，只发往你填写的接口地址，不会进入代码或分享链接。', 'ai.test': '测试连接', 'ai.testing': '测试中…', 'ai.ok': '连接成功：{r}', 'ai.fail': '连接失败：{e}', 'ai.save': '保存',
+    'ai.proxy': '已通过本地服务器接入模型：{m}（密钥留在服务器上）', 'ai.note': '密钥只保存在本设备的浏览器存储里，只发往你填写的接口地址，不会进入代码或分享链接。', 'ai.test': '测试连接', 'ai.testing': '测试中…', 'ai.ok': '连接成功：{r}', 'ai.fail': '连接失败：{e}', 'ai.save': '保存',
     'set.ai': 'AI 对手', 'set.aiOpen': '设置',
     'lobby.cardroom': '棋牌室', 'lobby.slots': '老虎机', 'lobby.tables': '赌桌', 'lobby.instant': '快速游戏', 'lobby.all': '全部',
     'lobby.withAI': '对手会说话', 'pv.wasBluff': '亮牌了：{who} 刚才说「{s}」——其实牌不怎么样，是在诈你。', 'pv.wasSandbag': '亮牌了：{who} 刚才说「{s}」——其实牌很大，是在装弱钓你。',
@@ -137,7 +137,7 @@
 
     'ai.title': 'AI opponents (language model)', 'ai.lead': 'Hand a house seat to a real language model: it reads the rules, the table and your chat, decides how to play, and bluffs you in the chat. Off by default; scripted personas play otherwise.',
     'ai.enable': 'Enable AI opponents', 'ai.base': 'Endpoint (Anthropic-compatible)', 'ai.key': 'API key', 'ai.model': 'Model', 'ai.seats': 'AI seats',
-    'ai.note': 'The key is stored only in this browser on this device and sent only to the endpoint you enter. It never goes into the code or a shared link.', 'ai.test': 'Test', 'ai.testing': 'Testing...', 'ai.ok': 'Connected: {r}', 'ai.fail': 'Failed: {e}', 'ai.save': 'Save',
+    'ai.proxy': 'Connected through the local server: {m} (the key stays on the server)', 'ai.note': 'The key is stored only in this browser on this device and sent only to the endpoint you enter. It never goes into the code or a shared link.', 'ai.test': 'Test', 'ai.testing': 'Testing...', 'ai.ok': 'Connected: {r}', 'ai.fail': 'Failed: {e}', 'ai.save': 'Save',
     'set.ai': 'AI opponents', 'set.aiOpen': 'Set up',
     'lobby.cardroom': 'Card room', 'lobby.slots': 'Slots', 'lobby.tables': 'Tables', 'lobby.instant': 'Instant', 'lobby.all': 'All',
     'lobby.withAI': 'Rivals talk', 'pv.wasBluff': 'Cards up: {who} said "{s}", and was holding very little. That was a bluff.', 'pv.wasSandbag': 'Cards up: {who} said "{s}", and was holding a monster. Playing weak to lure you in.',

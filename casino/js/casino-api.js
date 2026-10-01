@@ -53,10 +53,29 @@
 
   /* ---------- AI opponents: config lives only in this browser's storage ---------- */
   const AI_DEF = { enabled: false, baseURL: '', apiKey: '', model: '', seats: 1 };
+  // served by tools/serve.js, the page finds a model at llm/ and uses it without ever holding a key
+  let PROXY = null;
   const ai = {
-    get: () => Object.assign({}, AI_DEF, LS.get('ai', {})),
-    set(cfg) { LS.set('ai', Object.assign(ai.get(), cfg)); for (const id in lives) lives[id].rebrain(); emit('ai', { enabled: ai.on() }); },
-    on() { const c = ai.get(); return !!(c.enabled && c.baseURL && c.apiKey && c.model); },
+    get() {
+      const c = Object.assign({}, AI_DEF, LS.get('ai', {}));
+      if (PROXY && !(c.baseURL && c.apiKey)) return Object.assign(c, { proxy: true, baseURL: 'llm', apiKey: '', model: c.model || PROXY.model, enabled: !c.proxyOff });
+      return c;
+    },
+    set(cfg) {
+      const keep = Object.assign({}, AI_DEF, LS.get('ai', {}), cfg);
+      if (keep.proxy) { keep.proxyOff = !keep.enabled; delete keep.proxy; if (keep.baseURL === 'llm') keep.baseURL = ''; if (PROXY && keep.model === PROXY.model) keep.model = ''; }
+      LS.set('ai', keep); for (const id in lives) lives[id].rebrain(); emit('ai', { enabled: ai.on() });
+    },
+    on() { const c = ai.get(); return !!(c.enabled && c.model && (c.proxy || (c.baseURL && c.apiKey))); },
+    proxy: () => PROXY,
+    async detect() {
+      try {
+        const r = await fetch('llm/health', { cache: 'no-store' });
+        const j = r.ok ? await r.json() : null;
+        if (j && j.ok && j.model) { PROXY = j; for (const id in lives) lives[id].rebrain(); emit('ai', { enabled: ai.on(), proxy: true }); }
+      } catch (e) { /* plain static hosting: no proxy */ }
+      return PROXY;
+    },
     // one tiny round trip to check the endpoint, key and model
     async test() {
       const c = ai.get();
