@@ -387,11 +387,11 @@
     document.getElementById('btn-sound').onclick = () => { Sound.setSfx(!Sound.state.sfx); syncSoundBtn(); Sound.unlock(); Sound.fx.click(); };
     document.getElementById('btn-settings').onclick = () => { Sound.unlock(); openSettings(); };
     document.getElementById('refill').onclick = () => C.refill();
-    document.querySelector('.brand').onclick = e => { e.preventDefault(); Sound.fx.click(); C.go('lobby'); };
+    document.querySelector('.brand').onclick = e => { e.preventDefault(); Sound.fx.click(); C.go('city'); };
     syncSoundBtn();
     buildLobby();
     C.paintAll();
-    addEventListener('hashchange', () => C.go(location.hash.slice(1) || 'lobby'));
+    addEventListener('hashchange', () => C.go(location.hash.slice(1) || 'city'));
     addEventListener('keydown', e => C.keys(e));
     const unlock = () => { Sound.unlock(); removeEventListener('pointerdown', unlock); removeEventListener('keydown', unlock); };
     addEventListener('pointerdown', unlock); addEventListener('keydown', unlock);
@@ -400,7 +400,7 @@
       const b = e.target.closest('.btn, .tog, .spin-btn, .step-btn, .seg-btn');
       if (b && !b.disabled) U.pulse(b, 'press');
     });
-    C.go(location.hash.slice(1) || 'lobby');
+    C.go(location.hash.slice(1) || 'city');
     document.body.classList.add('ready');
     if (window.Casino && Casino.ai.detect) Casino.ai.detect();
   }

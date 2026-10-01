@@ -1,7 +1,7 @@
-# 金玉满堂 · Gold & Jade Casino
+# 金城浮生 · Gilded City
 
-棋牌室对战加经典赌场游戏，全部使用**虚拟筹码**：没有充值，没有兑现，没有真钱。
-Card-room games against talking opponents plus classic casino games, all with **virtual chips only**. Nothing to buy, nothing to cash out.
+一座霓虹城市里的人生模拟。你在这里上班、吃饭、睡觉、交朋友、谈恋爱、借钱和欠钱；城里二十多个人各有性格、记忆和日程，会记住你做过的事，也会把它传出去。接上大模型后，他们由 AI 扮演，你可以直接跟他们说话。**金玉满堂**赌场只是城里的一栋楼。全部使用**虚拟筹码**：没有充值，没有兑现，没有真钱。
+A life in a neon city. You work, eat, sleep, make friends, fall in love, borrow and owe. More than twenty people live here, each with a temperament, a memory and a daily routine; they remember what you did and tell each other. With a model connected, they are played by AI and you can talk to them in your own words. The **Gold & Jade** casino is one building in town. **Virtual chips only.** Nothing to buy, nothing to cash out.
 
 ## 运行 / Run
 
@@ -11,6 +11,37 @@ No build step. Open `index.html` directly, or serve the folder:
 ```bash
 cd casino && python3 -m http.server 8000   # http://localhost:8000
 ```
+
+要让城里的人由大模型扮演，用自带的小服务器启动。它从**环境变量**读取密钥，替页面转发请求，密钥不会进浏览器，也不会进仓库：
+To have the people played by a model, start the bundled server. It reads the key **from the environment** and forwards the page's requests, so the key never reaches the browser or the repository:
+
+```bash
+export ANTHROPIC_BASE_URL=https://your-endpoint
+export ANTHROPIC_AUTH_TOKEN=…            # never write it into a file in this repo
+node tools/serve.js                       # http://localhost:8000, picks a model from /v1/models
+node tools/serve.js --model your-model --port 8080
+```
+
+页面启动时会自动检测这个服务器，右上角显示「AI · 模型名」；没有它时，所有人用写好的剧本说话，游戏完整可玩。
+The page detects the server at start and shows "AI · model" in the HUD. Without it, everyone speaks from the script and the game is fully playable.
+
+## 城市 / The city
+
+- **地图**：老城区、中环、不夜街、海滨四个区，16 个地点，各有营业时间。走路免费、巴士 4 块、打车快但贵，路上都花时间。
+  **Map**: four districts and 16 places, each with opening hours. Walk for free, take the bus for 4, or a taxi that is fast and pricey. Travel takes time.
+- **人物**：5 项属性（体魄、头脑、魅力、定力、运气）、9 项技能（赌技、算牌、口才、识人、骗术、厨艺、体能、编程、生意经）、7 条状态（健康、精力、饱腹、心情、压力、赌瘾、醉意）和性格特质。技能越练越高，不练会慢慢退。
+  **You**: 5 attributes, 9 skills that grow with practice and fade without it, 7 status bars that change by the hour, and traits.
+- **关系**：好感、信任、熟络、心动四条线分开算，而且是双向的；朋友、至交、恋人、仇人由数值和事件决定。你干的事会变成消息，每晚在熟人之间传开。
+  **People**: affinity, trust, familiarity and romance, tracked separately and in both directions. What you do becomes news that spreads overnight.
+- **生计**：七份工作（外卖骑手、茶餐厅伙计、便利店店员、程序员、销售、荷官、补习老师），按表现升职；每周交租，不交会被赶出去；可以跟人借钱、借给别人，也可以找疤哥借高利贷。
+  **Living**: seven jobs with promotions; weekly rent or eviction; borrow from friends, lend to them, or go to the loan shark.
+- **对话**：点话题（闲聊、夸人、借钱、送礼、约会、表白、撒谎、威胁……）或直接打字。每句话的效果都显示出来，包括掷骰判定；信任够高或识人判定成功时，还能看到 TA 心里真正在想什么。
+  **Talking**: pick a topic or type freely. Every effect is shown, including the dice; with enough trust or a good read, you see what they really think.
+- **赌场**：走进金玉满堂就是原来那座可以走动的赌场，精力和醉意带进去，输赢和时间带出来，赌瘾随之变化。
+  **The casino**: walk into the Gold & Jade and you are on the old casino floor. Your energy goes in with you; the result and the hours come back out, and so does the habit.
+
+设计细节见 [docs/LIFE_DESIGN.md](docs/LIFE_DESIGN.md)。
+Design notes: [docs/LIFE_DESIGN.md](docs/LIFE_DESIGN.md).
 
 ## 游戏 / Games
 
@@ -94,10 +125,20 @@ js/story.js         开局、借贷、催收、成就、结局 window.Story
 js/lottery.js       彩票大厅与刮刮乐 window.Lottery
 js/tutorial.js      新手引导、新手学堂、21点教练
 js/main.js          大厅、幸运转盘、设置、启动
+js/world/data.js    城市的内容：属性、技能、特质、地点、行动、工作、人物、关系网
+js/world/core.js    城市的规则（无 DOM，node 里也能跑）：时钟、状态、关系、传闻、行动、借贷 World
+js/world/mind.js    对话：模型扮演或剧本判定，效果一律过规则校验 WorldMind
+js/life/portrait.js 程序化画的人物头像，带表情 Portrait
+js/life/art.js      城市夜景地图、每个地点的场景、属性雷达图 Art
+js/life/bridge.js   把城市接到赌场：钱包、时钟、存款、借贷共用 window.Life
+js/life/city.js     城市画面：HUD、地图、地点、对话、人物卡、人脉网、手机、日记
 docs/AGENT_API.md   AI 接入文档 / how agents and language models join the tables
 tools/llm-agent.js  命令行里让大模型上桌：node tools/llm-agent.js table zhajinhua
 tools/sim.js        老虎机与弹珠台的 RTP 模拟：node tools/sim.js
 tools/i18n-check.js 校验两种语言的文案键是否齐全
+tools/serve.js      本地服务器 + 模型转发（密钥只从环境变量读）
+tools/life-sim.js   命令行跑人生：node tools/life-sim.js --days 14；--agent 让模型自己过日子
+docs/LIFE_DESIGN.md 人生模拟的设计文档
 ```
 
 ## 新手 / Beginners
@@ -118,6 +159,8 @@ The math, dealing, ledger, odds, rake, lottery draws, interest and collection sc
   **Opponents**: each turn returns `{think, action, say}`. They bluff and bait; after the hand you see what they were really thinking (in purple). Every action is checked against the rules; on failure the seat falls back to its script.
 - **叠码仔、催收、家人**：用模型说话；你可以在手机上跟催收讨价还价，模型决定给不给宽限，但最多 2 天，由脚本卡死。
   **Junket agent, collector, family**: they speak through the model. You can plead with the collector by text; the model decides whether to grant extra days, and the script caps it at 2.
+- **城里的人**：模型拿到这个人的身份、性格、状态、记忆、和你的关系以及当下的场景，回一句话、一句心里话和一组效果（加好感、借钱给你、教你技能、约你见面、给你工作……）。效果先过规则：每句话好感最多 ±8，借钱不超过对方手里的钱、也不超过信任允许的额度，工作要满足条件，心动要先有好感。说什么都行，改变世界只能在规则之内。
+  **People in the city**: the model gets the person (who they are, temperament, state, memories), how they see you and the scene, and answers with a line, a private thought and a list of effects (affinity, a loan, a lesson, a date, a job…). Every effect is checked: at most ±8 affinity per line, loans capped by their cash and their trust, jobs by requirements, romance by affinity. The model can say anything; it can only change the world within the rules.
 - 默认（不接模型）时，这些角色都用写好的台词，游戏完整可玩。
   Without a model, all of them use written lines and the game is fully playable.
 - 密钥只存在你自己浏览器的 localStorage，或命令行的环境变量里，**不要提交进仓库**。

@@ -458,6 +458,14 @@
     const n = net();
     Sound.fx.doors && Sound.fx.doors();
     if (window.Floor) Floor.stop();
+    if (window.Life && Life.active()) {               // out the doors and back into the city, same clock
+      await night(t('sv.out'), t(n < 0 ? 'sv.dawn.lost' : 'sv.dawn.won', { n: U.fmt(Math.abs(n)) }), 2600);
+      const r = window.Story && Story.onExit ? await Story.onExit({ net: n, theo: N.theo }) : null;
+      const v = vit();
+      N = fresh(); saveN();
+      if (r !== 'end') Life.onLeave({ net: n, energy: v.energy, drunk: v.drunk });
+      return;
+    }
     const m = ((V.min % 1440) + 1440) % 1440;
     await night(t(m < 600 ? 'sv.dawn' : 'sv.home'), t(n < 0 ? 'sv.dawn.lost' : 'sv.dawn.won', { n: U.fmt(Math.abs(n)) }), 4200);
     const r = window.Story && Story.onExit ? await Story.onExit({ net: n, theo: N.theo }) : null;
@@ -508,6 +516,9 @@
     life: () => V.life,
     drink, stage, nightScene: night,
     energize(n) { V.energy = U.clamp(V.energy + n, 0, 100); save(); },
+    // the city hands over how you are when you walk in, and keeps you awake while you are out there
+    setVit(o) { if (o.energy != null) V.energy = U.clamp(o.energy, 0, 100); if (o.drunk != null) V.drunk = U.clamp(o.drunk, 0, 100); save(); },
+    startNight() { N = fresh(); saveN(); },
     // a new life: fresh night, rested, sober; the club and wardrobe stay with the player
     reset() { V.energy = 100; V.drunk = 0; V.min = Math.max(V.min, 0); N = fresh(); saveN(); save(); }
   };

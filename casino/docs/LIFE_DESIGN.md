@@ -19,14 +19,14 @@ tools/serve.js       serves the game and forwards model calls with the key from 
 
 | group | fields | range |
 |---|---|---|
-| 属性 attributes | body 体魄, mind 头脑, charm 魅力, will 定力, luck 运气 | 1–10, slow to change |
+| 属性 attributes | body 体魄, mind 头脑, charm 魅力, will 定力, luck 运气 | 1–10 at base (items and buffs can lift one to 12), slow to change |
 | 技能 skills | gamble 赌技, odds 算牌, talk 口才, read 识人, lie 骗术, cook 厨艺, fit 体能, code 编程, biz 生意经 | 0–100, grow with practice, decay slowly |
 | 状态 status | health 健康, energy 精力, full 饱腹, mood 心情, stress 压力, urge 赌瘾, drunk 醉意 | 0–100, change by the hour |
 | 特质 traits | gambler, impulsive, cautious, warm, stingy, proud, shrewd, naive, loyal, grudge, romantic, superstitious | modify rolls and drift |
 | 资产 money | cash, bank, items | the player's cash is the chip wallet |
 | 记忆 memory | what this person remembers about you, with weight | the last 24 notes |
 
-Skill checks: `chance = base + skill/2 + attr*3 + relationship terms + trait terms`, clamped to 5–95%. The roll is shown after the fact, so a player can learn what drives success.
+Skill checks: `chance = base + skill/2 + (attr − 5)×3 + relationship and trait terms − drunk/8`, clamped to 5–95%. An average attribute (5) adds nothing; a 10 adds 15 points, a 1 takes 12 away. The roll is shown after the fact, so a player can learn what drives success.
 
 ## 3. Relationships
 
@@ -87,6 +87,20 @@ What the person really thought (`think`) is kept. When trust grows, or when news
 
 A language model can live a whole life through these calls (`node tools/life-sim.js --agent`).
 
-## 9. The model connection
+## 9. The screens
+
+The city is the home screen (`#city`); the casino lobby is one building on its map.
+
+- **HUD**: portrait, day and time, where you are, cash, bank and debt, status bars that warn when low, the AI badge and the phone badge.
+- **地图 Map**: the city at its time of day, with the people you know drawn where they are. Tap a place for its hours, who is there and how to get there (walk, bus or taxi, each with its time and cost); travel is animated along the route. Inside a place: a scene with the people present, jobs to take or work, and every action with its effects and, when it is greyed out, the reason.
+- **我 Me**: attribute radar, skills with levels, status, job and promotion progress, items, lifetime stats.
+- **人脉 People**: a web with you in the middle; distance is closeness, colour is the relationship, dashed lines are ties between other people. Tap anyone for their sheet: affinity, trust, respect, romance, fear, what they remember, and Talk, Call or Go find.
+- **手机 Phone**: messages, requests waiting for an answer, plans, rent and debts (story debts open the 网贷 app), money you lent, contacts and gossip you picked up.
+- **日记 Diary**: everything that happened, by day.
+- **Talk panel**: the person's face changes with their mood. Pick an intent (chat, flatter, borrow, lie, flirt, ask for a job, …) or type anything. Each reply shows its effects as chips, the dice roll when a skill was checked, and whether the model or the script answered.
+
+Long actions run a short time-lapse. Walking into the casino hands your energy and drunkenness to the floor; walking out hands back the night's net, the minutes spent and how tired you are, and puts you outside the casino at that hour.
+
+## 10. The model connection
 
 `tools/serve.js` reads `ANTHROPIC_BASE_URL` and `ANTHROPIC_AUTH_TOKEN` from the environment, serves the game, and forwards `POST /llm/v1/messages`. The page checks `/llm/health` at start and turns AI on when the server answers, so the key never reaches the browser or the repository. Without the server, the page can still call an endpoint directly with a key from Settings, which is kept in this browser only.

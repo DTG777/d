@@ -240,7 +240,47 @@ Chip conservation is checked at the end of every `table` run.
 
 ---
 
-## 7. Writing a new engine
+## 7. The city: `window.Life`
+
+The casino is one building in 金城浮生, a life simulator. The same pattern holds: observe, check what is legal, act. The rules are in `docs/LIFE_DESIGN.md`.
+
+```js
+Life.observe()          // { time, day, hour, at, place, cash, bank, me: { attrs, skills, status, traits, items }, job, rent, debts, lent, asks, here, unread, intel, stats }
+Life.legal()            // what you can do here and now: [{ type: 'go', to, walk, bus, taxi } | { type: 'do', id, min, cost, ok, why } | …]
+Life.legal({ all: true })  // also the actions you cannot take yet, each with the reason
+Life.act({ type: 'go', to: 'teahouse', by: 'walk' })   // walk | bus | taxi
+Life.act({ type: 'do', id: 'sleep', hours: 8 })
+Life.act({ type: 'work' })
+Life.act({ type: 'do', id: 'casino' })                 // walks into the casino; leaving brings the night back
+await Life.talk('mom', '妈，最近身体好吗？')               // free text (someone here, or someone you can call)
+await Life.talk('lin', { intent: 'borrow', amount: 5000 })
+Life.person('lin')      // traits, relationship (affinity, trust, respect, romance, fear), memories, where they are
+Life.people(true)       // people here; Life.people() for everyone you know
+Life.relations()        // the whole web, including ties between other people
+Life.map()  Life.log(50)
+Life.ai()               // { on, model }
+```
+
+`talk` returns `{ ok, say, emotion, effects, intent, check: { ok, chance, roll, skill, attr }, via: 'model' | 'script', events }`. The model proposes effects; the world clamps and validates them, so a conversation can change money, relationships, memories, plans and jobs, but only within bounds.
+
+### Tools
+
+`Life.tools()` returns function-calling definitions (`life_observe`, `life_legal`, `life_act`, `life_talk`, `life_person`, `life_map`). `Life.call(name, input)` runs one. In node, `World.create()` gives the same object without the casino attached:
+
+```bash
+node tools/life-sim.js [--days 14]     # a scripted resident lives N days; prints the diary, checks invariants
+node tools/life-sim.js --agent [--turns 60] [--model name]   # a model lives it through the life_* tools
+```
+
+### The model, without a key in the page
+
+```bash
+ANTHROPIC_BASE_URL=https://your-endpoint ANTHROPIC_AUTH_TOKEN=… node tools/serve.js [--model name] [--port 8080]
+```
+
+`tools/serve.js` serves the game and forwards `POST /llm/v1/messages`, adding the key from its environment. The page asks `/llm/health` at start; when the server answers, AI turns on for the people in the city and the table opponents, and the browser never holds a key. On plain static hosting that request is a harmless 404 and the page falls back to the Settings key, or to the script.
+
+## 8. Writing a new engine
 
 ```js
 Engines.define({

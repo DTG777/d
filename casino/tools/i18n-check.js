@@ -7,7 +7,7 @@ global.window = global;
 require('../js/i18n.js');
 for (const f of fs.readdirSync(path.join(__dirname, '../js')).filter(f => /^i18n-.+\.js$/.test(f))) require('../js/' + f);
 const D = I18N._dict;
-const files = [...fs.readdirSync(path.join(__dirname, '../js')).filter(f => f.endsWith('.js') && !f.startsWith('i18n') && !['util.js', 'audio.js'].includes(f)).map(f => 'js/' + f), ...fs.readdirSync(path.join(__dirname, '../js/games')).map(f => 'js/games/' + f)];
+const files = [...fs.readdirSync(path.join(__dirname, '../js')).filter(f => f.endsWith('.js') && !f.startsWith('i18n') && !['util.js', 'audio.js'].includes(f)).map(f => 'js/' + f), ...fs.readdirSync(path.join(__dirname, '../js/games')).map(f => 'js/games/' + f), ...fs.readdirSync(path.join(__dirname, '../js/life')).map(f => 'js/life/' + f)];
 const keys = new Set();
 for (const f of files) {
   const src = fs.readFileSync(path.join(__dirname, '..', f), 'utf8');
@@ -74,6 +74,13 @@ for (let i = 1; i <= 3; i++) keys.add('st.junket.hi.' + i);
 ['demo', 'rich'].forEach(k => keys.add('st.fam.' + k));
 ['has', 'credit', 'multi', 'max'].forEach(k => keys.add('st.rej.' + k));
 ['msgs', 'bills', 'bank', 'ach', 'ends', 'life', 'loans'].forEach(k => keys.add('st.app.' + k));
+// the city: tabs, intents, tags, skill levels, legend
+['map', 'me', 'people', 'phone', 'diary'].forEach(k => keys.add('lf.tab.' + k));
+require('../js/world/mind.js').INTENTS.forEach(k => keys.add('lf.in.' + k));
+['family', 'friend', 'close', 'partner', 'colleague', 'boss', 'landlord', 'rival', 'ex', 'enemy'].forEach(k => keys.add('lf.tag.' + k));
+[0, 1, 2, 3, 4].forEach(i => keys.add('lf.sklv.' + i));
+['close', 'friend', 'love', 'known', 'hostile'].forEach(k => keys.add('lf.lg.' + k));
+['aff', 'trust', 'fam', 'love'].forEach(k => keys.add('lf.r.' + k));
 // lottery: games, scratch cards, tabs, table columns
 const LT = fs.readFileSync(path.join(__dirname, '../js/lottery.js'), 'utf8');
 const ltKeys = name => [...LT.match(new RegExp('const ' + name + ' = \\{([\\s\\S]*?)\\n  \\};'))[1].matchAll(/^    (\w+): \{ reg: '\w+', (?:kind: '(\w+)')?/gm)].map(m => [m[1], m[2]]);

@@ -25,7 +25,7 @@
     ['teach', /教我|教教|指点|teach|show me how|train me/i],
     ['job', /工作|招人|上班|请人|职位|job|hire|hiring|work for you|position/i],
     ['number', /电话|微信|号码|联系方式|number|contact|whatsapp/i],
-    ['rumor', /听说|八卦|消息|最近.*怎么样|有什么新鲜|rumou?r|gossip|what'?s new|any news|heard anything/i],
+    ['rumor', /听说|八卦|消息|有什么新鲜|最近.*(出了|发生)什么|rumou?r|gossip|what'?s new|any news|heard anything/i],
     ['advice', /怎么办|建议|该不该|意见|advice|should i|what do you think i/i],
     ['confide', /心事|压力|难受|烦|累|睡不着|想不开|stressed|tired of|can'?t sleep|depressed|struggling/i],
     ['praise', /厉害|佩服|牛|了不起|好厉害|great|amazing|respect|impressive|you'?re the best/i],
@@ -91,7 +91,13 @@
   function scripted(api, who, intent, input, ctx) {
     const D = api.D, P = D.PEOPLE[who], r = api.rel(who, 'me'), has = t => api.has(who, t), S = api.S;
     const out = { effects: [], emotion: 'neutral' };
-    const line = (k, ok, p) => fill(pickL(api, LINES[k][ok ? 'ok' : 'no']), p);
+    const said = (S.P[who].chat || []).filter(x => x.r === 'npc').slice(-3).map(x => x.text);
+    const line = (k, ok, p) => {                 // don't say the same thing twice in a row
+      const pool = LINES[k][ok ? 'ok' : 'no'];
+      let out = fill(pickL(api, pool), p);
+      for (let i = 0; i < 4 && said.includes(out) && pool.length > 1; i++) out = fill(pickL(api, pool), p);
+      return out;
+    };
     const relMod = r.aff / 4 + r.trust / 6;
     let c = null, fx = [];
     const roll = (skill, attr, base, mod = 0) => (c = api.check(skill, attr, { base, mod }));
@@ -147,14 +153,14 @@
         const d = S.debts.find(x => x.who === who);
         if (!d) { out.say = api.tx(L('你不欠我钱啊。', 'You don’t owe me anything.')); break; }
         const n = Math.min(Math.round(d.amt), input.amount || Math.round(d.amt));
-        const h = api.hand(who, { cash: n });
+        const h = input.handed || api.hand(who, { cash: n });
         out.say = h && h.repaid ? line('repay', true) : line('repay', false);
         out.emotion = h && h.repaid ? 'happy' : 'cold';
         break;
       }
       case 'gift': {
         const item = (input.give && input.give.item) || (S.me.items.gift_l > 0 ? 'gift_l' : S.me.items.gift_s > 0 ? 'gift_s' : null);
-        const h = item ? api.hand(who, { item }) : input.give && input.give.cash ? api.hand(who, { cash: input.give.cash }) : null;
+        const h = input.handed ? input.handed : item ? api.hand(who, { item }) : input.give && input.give.cash ? api.hand(who, { cash: input.give.cash }) : null;
         const ok = h && !h.err && !(has('cautious') && r.fam < 10);
         out.say = ok ? line('gift', true) : h && h.err ? api.tx(L('（你手上没有礼物）', '(You have nothing to give.)')) : line('gift', false);
         out.emotion = ok ? 'happy' : 'neutral';
@@ -310,7 +316,7 @@
       } catch (e) { res = null; api.S.flags.llmErr = String(e.message || e).slice(0, 120); }
     }
     if (!res) {
-      const s = scripted(api, who, intent, Object.assign({}, o, { amount }), ctx);
+      const s = scripted(api, who, intent, Object.assign({}, o, { amount, handed }), ctx);   // the model failed after the gift changed hands: don't hand it twice
       const effects = (s.applied || []).concat(api.effects(who, s.proposed));
       res = { say: s.say, think: s.think, emotion: s.emotion, effects, intent, check: s.check, via: 'script' };
     }

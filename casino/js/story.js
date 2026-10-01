@@ -45,6 +45,8 @@
     META.runs++;
     if (window.Services && Services.reset) Services.reset();
     save();
+    // the city starts a new life with the same opening
+    try { dispatchEvent(new CustomEvent('story:new', { detail: { op } })); } catch (e) { /* no listeners */ }
   }
   const day = () => Math.floor(now() / DAY);
   const active = () => R ? R.loans.filter(l => !l.done) : [];
@@ -608,6 +610,8 @@
     borrow: (src, amt) => R && (src === 'marker' || src === 'junket' || canBorrow(src) === true) ? addLoan(src, amt).id : false,
     repay: id => { const L = R && R.loans.find(l => l.id === id); return L ? repay(L, owe(L)) : false; },
     achievements: () => Object.assign({}, META.ach), endings: () => Object.assign({}, META.ends),
-    get run() { return R ? R.op : null; }
+    get run() { return R ? R.op : null; },
+    // savings, shared with the city (the bank there is this bank)
+    bank: { get: () => R ? R.bank : 0, add(n) { if (!R) return; R.bank = Math.max(0, R.bank + Math.round(n)); save(); } }
   };
 })();

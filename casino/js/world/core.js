@@ -8,6 +8,7 @@
      lang()                  'zh' | 'en'
      rng()                   random source (seeded in tests)
      llm(system, messages)   a model call returning text; without it people speak from the script
+     llmOn()                 whether the model is switched on right now (default: whenever llm is given)
      save(state)             persistence
      notify(event)           every event, as it happens
 
@@ -890,7 +891,7 @@
     const api = {
       D, get S() { return S; }, T, tx, fmt, now, day, hour, clock, rng, lang, name, rel, relView, tagsOf, has, check, practice,
       remember, effects, hand, news, person, whereIs, peopleAt, cash, emit, msg, ask, answer,
-      llm: hooks.llm || null, today, contacts
+      get llm() { return hooks.llm && (!hooks.llmOn || hooks.llmOn()) ? hooks.llm : null; }, today, contacts
     };
 
     return {
@@ -899,6 +900,8 @@
       msgs: () => S ? S.msgs.slice().reverse() : [],
       readAll: () => { if (S) S.msgs.forEach(m => { m.read = true; }); save(); },
       setAt: p => { if (S && D.PLACES[p]) { S.at = p; save(); } },
+      // the casino hands its own energy and drunkenness back when you walk out
+      setStatus: o => { if (!S) return; for (const k of ['energy', 'drunk', 'mood', 'stress']) if (o[k] != null) S.me.st[k] = clamp(Math.round(o[k]), 0, 100); save(); },
       get state() { return S; }, get started() { return !!S; },
       clock, travel: (to, by) => travel(S.at, to, by), isOpen, whereIs, name, tx, T, api, D
     };
