@@ -1,6 +1,9 @@
 /* Strings for Lucky 777, God of Wealth and Treasure Bowl. */
 (function () {
   const zh = {
+    'floor.jp': '聚宝盆累积奖池', 'floor.jpSub': '按 100 注计 · 全场每一转都在往里加', 'floor.live': '大厅实况',
+    'floor.won': '在{g}赢了', 'floor.you': '你',
+    'floor.names': '王老板,阿杰,小美,澳门陈生,东北虎,深圳Tony,李姐,胖虎,锦鲤本鲤,夜猫子,老周,温州林总,阿珍,广州靓仔,不睡觉的猫',
     'game.classic': '幸运777', 'game.caishen': '财神到', 'game.treasure': '聚宝盆',
     'tag.classic': '3 轴经典 · 拉杆 · 百搭翻倍 · 最高 1000 倍',
     'tag.caishen': '6×5 消除连爆 · 倍数福球 · 可购买免费旋转',
@@ -50,6 +53,9 @@
     'tb.r4': '顶上的奖池随全场下注实时上涨，显示的是按你当前下注额折算的金额（以 100 注为基准等比缩放）。中奖后奖池重置。按奖池起始值计算，理论返还率约 95%；奖池涨得越高，返还越多。',
   };
   const en = {
+    'floor.jp': 'Treasure Bowl jackpots', 'floor.jpSub': 'Quoted for a 100 bet · every spin on the floor feeds them', 'floor.live': 'On the floor',
+    'floor.won': 'won on {g}', 'floor.you': 'You',
+    'floor.names': 'VegasVinnie,Lucky_Lin,HighRoller88,MissJade,DragonKing,NightOwl,Ace_Mike,Tony_SZ,GoldenKoi,Mr.Chen,BigSal,Rosie777,KingOfTilt,Marco_P,QueenOfDiamonds',
     'game.classic': 'Lucky 777', 'game.caishen': 'God of Wealth', 'game.treasure': 'Treasure Bowl',
     'tag.classic': '3-reel classic, pull lever, wilds double, up to 1000×',
     'tag.caishen': '6×5 tumbles, multiplier orbs, buy free spins',

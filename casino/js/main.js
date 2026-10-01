@@ -128,6 +128,13 @@
           </div>
         </div>
       </div>
+      <div class="floor">
+        <a class="floor-jp" href="#treasure">
+          <div class="fj-head"><b data-i18n="floor.jp">${t('floor.jp')}</b><span data-i18n="floor.jpSub">${t('floor.jpSub')}</span></div>
+          <div class="tb-jp">${['grand', 'major', 'minor', 'mini'].map(k => `<div class="jp jp-${k}"><span data-i18n="tb.jp.${k}">${t('tb.jp.' + k)}</span><b class="fj-${k}"></b></div>`).join('')}</div>
+        </a>
+        <div class="floor-feed"><div class="ff-head"><i class="live-dot"></i><b data-i18n="floor.live">${t('floor.live')}</b></div><ul class="ff-list"></ul></div>
+      </div>
       ${SECTIONS.map(sec => `
       <div class="lobby-sec"><h2 data-i18n="lobby.${sec}">${t('lobby.' + sec)}</h2><p data-i18n="lobby.${sec}Sub">${t('lobby.' + sec + 'Sub')}</p></div>
       <div class="lobby-grid">
@@ -149,11 +156,14 @@
       a.addEventListener('click', () => Sound.fx.click());
     });
     refreshLobby();
+    paintFeed();
   }
   function refreshLobby() {
     const root = document.querySelector('.view[data-view="lobby"]');
     if (!root) return;
     const s = C.S.stats;
+    const jp = Casino.Jackpots.values;
+    for (const k in jp) { const el = root.querySelector('.fj-' + k); if (el) el.textContent = U.fmt(Math.floor(jp[k])) + '.' + String(Math.floor(jp[k] * 100) % 100).padStart(2, '0'); }
     root.querySelector('.st-big').textContent = U.fmt(s.biggest);
     root.querySelector('.st-rounds').textContent = U.fmt(s.rounds);
     root.querySelector('.st-mult').textContent = s.bestMult ? s.bestMult + '×' : '—';
@@ -169,6 +179,51 @@
     }
   }
   C.onLobby = refreshLobby;
+
+  /* ---------- the floor: what everyone else is winning ---------- */
+  const FEED_GAMES = ['caishen', 'caishen', 'treasure', 'treasure', 'slots', 'classic', 'crash', 'crash', 'roulette', 'baccarat', 'blackjack', 'sicbo', 'plinko', 'zhajinhua', 'niuniu', 'mahjong'];
+  const FEED_BETS = [20, 50, 50, 100, 100, 100, 200, 200, 500, 1000, 2000, 5000];
+  // a plausible multiplier per game: mostly small, now and then something that makes you look twice
+  const feedMult = g => {
+    const tail = (lo, a, cap) => Math.min(cap, lo / Math.pow(1 - Math.random(), a));
+    switch (g) {
+      case 'roulette': return Math.random() < 0.3 ? 36 : U.pick([2, 3, 6, 12]);
+      case 'baccarat': return U.pick([1.95, 2, 2, 9, 12]);
+      case 'blackjack': return U.pick([2, 2, 2.5, 4]);
+      case 'sicbo': return U.pick([2, 2, 9, 31, 61, 151]);
+      case 'crash': return Math.round(tail(1.5, 0.9, 400) * 100) / 100;
+      case 'plinko': return U.pick([3, 5, 9, 13, 26, 130]);
+      case 'zhajinhua': case 'niuniu': case 'mahjong': return U.pick([3, 4, 6, 8, 12, 24]);
+      default: return Math.round(tail(3, 0.85, 2500));
+    }
+  };
+  const feed = [];
+  function pushFeed(e) {
+    feed.unshift(e); feed.length = Math.min(feed.length, 6);
+    paintFeed(true);
+  }
+  function fakeWin() {
+    const g = U.pick(FEED_GAMES), bet = U.pick(FEED_BETS), mult = feedMult(g);
+    return { who: U.randInt(0, 14), g, amt: Math.round(bet * mult), mult };
+  }
+  function paintFeed(fresh) {
+    const ul = document.querySelector('.view[data-view="lobby"] .ff-list');
+    if (!ul) return;
+    const names = t('floor.names').split(',');
+    ul.innerHTML = feed.map((e, i) => `<li class="${e.mult >= 50 ? 'big' : ''}${e.you ? ' you' : ''}${fresh && i === 0 ? ' new' : ''}">
+      <b class="ff-n">${e.you ? t('floor.you') : names[e.who % names.length]}</b>
+      <span class="ff-g">${t('floor.won', { g: t('game.' + e.g) })}</span>
+      <b class="ff-a">+${U.fmt(e.amt)}</b>${e.mult >= 2 ? `<span class="ff-x">×${e.mult}</span>` : ''}</li>`).join('');
+  }
+  for (let i = 0; i < 5; i++) feed.push(fakeWin());
+  (function tick() {
+    if (C.current === 'lobby' && !document.hidden) { pushFeed(fakeWin()); if (feed[0].mult >= 50) Sound.fx.chip && Sound.fx.chip(); }
+    setTimeout(tick, U.rand(2200, 6500));
+  })();
+  addEventListener('langchange', () => paintFeed());
+  // your own good wins show up on the floor too
+  const rec = C.record.bind(C);
+  C.record = (ret, bet) => { rec(ret, bet); if (bet > 0 && ret >= bet * 5 && C.current && C.current !== 'lobby') feed.unshift({ you: true, g: C.current, amt: Math.round(ret), mult: Math.round(ret / bet * 10) / 10 }); feed.length = Math.min(feed.length, 6); };
   setInterval(() => { if (C.current === 'lobby') refreshLobby(); }, 1000);
 
   /* ---------- bonus wheel ---------- */
