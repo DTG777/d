@@ -5,11 +5,9 @@ global.navigator = { language: 'en' };
 global.document = { documentElement: {} };
 global.window = global;
 require('../js/i18n.js');
-require('../js/i18n-more.js');
-require('../js/i18n-tut.js');
-require('../js/i18n-slots.js');
+for (const f of fs.readdirSync(path.join(__dirname, '../js')).filter(f => /^i18n-.+\.js$/.test(f))) require('../js/' + f);
 const D = I18N._dict;
-const files = ['js/core.js', 'js/fx.js', 'js/main.js', 'js/tutorial.js', ...fs.readdirSync(path.join(__dirname, '../js/games')).map(f => 'js/games/' + f)];
+const files = [...fs.readdirSync(path.join(__dirname, '../js')).filter(f => f.endsWith('.js') && !f.startsWith('i18n') && !['util.js', 'audio.js'].includes(f)).map(f => 'js/' + f), ...fs.readdirSync(path.join(__dirname, '../js/games')).map(f => 'js/games/' + f)];
 const keys = new Set();
 for (const f of files) {
   const src = fs.readFileSync(path.join(__dirname, '..', f), 'utf8');
@@ -38,6 +36,16 @@ EN.list.treasure.NAMES.forEach(n => keys.add('tb.sym.' + n));
 ['grand', 'major', 'minor', 'mini'].forEach(k => keys.add('tb.jp.' + k));
 Object.keys(EN.list.mahjong.FAN_NAME).forEach(f => keys.add('mj.f.' + f));
 for (const m of fs.readFileSync(path.join(__dirname, '../js/engine/ddz.js'), 'utf8').matchAll(/type: '(\w+)'/g)) if (!['play', 'pass', 'bid', 'start'].includes(m[1])) keys.add('dz.c.' + m[1]);
+// the floor: every zone, place and talking role
+const FLOOR = fs.readFileSync(path.join(__dirname, '../js/floor.js'), 'utf8');
+for (const m of FLOOR.matchAll(/\{ id: '(\w+)', r: \[/g)) { keys.add('zone.' + m[1]); keys.add('zsub.' + m[1]); }
+for (const m of FLOOR.matchAll(/(?:svc|fn): '(\w+)', ux/g)) { keys.add('svc.' + m[1]); keys.add('svcSub.' + m[1]); }
+for (const m of FLOOR.matchAll(/talk: '(\w+)'/g)) if (m[1] !== 'persona') keys.add('npc.' + m[1]);
+for (const m of FLOOR.matchAll(/'sign', '(\w+)'/g)) keys.add('zone.' + m[1]);
+['slot', 'slotwin', 'tablewin', 'table', 'card', 'dealer', 'bar', 'din', 'walk', 'waitress', 'pitboss', 'vip', 'lottoguy', 'pianist'].forEach(k => keys.add('fl.chat.' + k));
+['hao', 'ling', 'oldk', 'mei', 'ace', 'fei'].forEach(k => keys.add('fl.p.' + k));
+['bartender', 'cashier', 'club', 'host', 'chef', 'lotto', 'concierge', 'shop', 'hotel', 'bell', 'doorman', 'pianist'].forEach(k => keys.add('fl.hi.' + k));
+['taken', 'marquee.slots', 'marquee.pit', 'music.on', 'music.off', 'vipSub', 'pvpSub', 'use', 'play'].forEach(k => keys.add('fl.' + k));
 let bad = 0;
 for (const k of [...keys].filter(k => !k.endsWith('.'))) for (const l of ['zh', 'en']) if (D[l][k] == null) { console.log('missing', l, k); bad++; }
 for (const k of Object.keys(D.zh)) if (D.en[k] == null) { console.log('en lacks', k); bad++; }

@@ -11,9 +11,9 @@
   /* ---------- tours: [selector | null (centred), i18n key] ---------- */
   const TOURS = {
     lobby: [
-      [null, 'tut.lobby.1'], ['#balance', 'tut.lobby.2'], ['.bonus-card', 'tut.lobby.3'],
-      ['.tile-zhajinhua', 'tut.lobby.4'], ['.tile-slots', 'tut.lobby.5'], ['.tile-blackjack', 'tut.lobby.6'],
-      ['.tile-crash', 'tut.lobby.7'], ['#btn-settings', 'tut.lobby.8'], ['.academy-btn', 'tut.lobby.9'], [null, 'tut.lobby.10']
+      [null, 'tut.lobby.1'], ['#balance', 'tut.lobby.2'], ['.fl-cv', 'tut.lobby.3'], ['.fl-mini', 'tut.lobby.4'],
+      ['.fl-dir-btn', 'tut.lobby.5'], ['.fl-phone-btn', 'tut.lobby.6'], ['.fl-tl', 'tut.lobby.7'],
+      ['#btn-settings', 'tut.lobby.8'], ['.fl-aca-btn', 'tut.lobby.9'], [null, 'tut.lobby.10']
     ],
     slots: [['.reels-frame', 'tut.slots.1'], ['.bet-step', 'tut.slots.2'], ['.spin-btn', 'tut.slots.3'], ['.slot-toggles', 'tut.slots.4'], ['.slot-meter', 'tut.slots.5']],
     classic: [['.cl-glass', 'tut.classic.1'], ['.cl-line', 'tut.classic.2'], ['.cl-lever', 'tut.classic.3'], ['.bet-step', 'tut.slots.2']],
@@ -145,16 +145,20 @@
     st.welcome = true; save();
     tour(TOURS.lobby, {
       final: [
-        { label: t('game.slots'), run: () => C.go('slots') },
-        { label: t('game.blackjack'), run: () => C.go('blackjack') },
-        { label: t('game.zhajinhua'), run: () => C.go('zhajinhua') },
+        { label: t('game.slots'), run: () => (window.Floor && Floor.goto('slots')) || C.go('slots') },
+        { label: t('game.blackjack'), run: () => (window.Floor && Floor.goto('blackjack')) || C.go('blackjack') },
+        { label: t('game.zhajinhua'), run: () => (window.Floor && Floor.goto('zhajinhua')) || C.go('zhajinhua') },
         { label: t('tut.explore'), run: () => {} }
       ]
     });
   }
   // a game opened for the first time gets its tour once the view has settled
   function onEnter(id) {
-    if (id === 'lobby') { if (!st.welcome) setTimeout(() => C.current === 'lobby' && !document.querySelector('.modal-ov') && lobbyTour(), 700); return; }
+    if (id === 'lobby') {
+      // wait for the walk-in and any opening screen before the first tour
+      if (!st.welcome) { let n = 0; const wait = () => { if (C.current !== 'lobby' || st.welcome || ++n > 120) return; if ((window.Floor && Floor.intro) || document.querySelector('.modal-ov, .st-ov')) setTimeout(wait, 500); else setTimeout(() => C.current === 'lobby' && !document.querySelector('.modal-ov, .st-ov') && lobbyTour(), 600); }; setTimeout(wait, 700); }
+      return;
+    }
     stop();
     if (!st.seen[id]) setTimeout(() => C.current === id && !document.querySelector('.modal-ov') && gameTour(id), 650);
   }

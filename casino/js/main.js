@@ -104,15 +104,17 @@
     return '';
   }
 
+  // the lobby is the casino floor; the classic grid lives in its directory drawer
   function buildLobby() {
-    const root = document.querySelector('.view[data-view="lobby"]');
+    const view = document.querySelector('.view[data-view="lobby"]');
+    Floor.mount(view);
+    const root = Floor.dirLobby;
     root.innerHTML = `
       <div class="lobby-hero">
         <div class="hero-copy">
           <p class="eyebrow" data-i18n="lobby.eyebrow">${t('lobby.eyebrow')}</p>
           <h1 class="hero-title"><span data-i18n="brand">${t('brand')}</span></h1>
           <p class="hero-sub" data-i18n="lobby.sub">${t('lobby.sub')}</p>
-          <button class="btn btn-ghost academy-btn">${C.icon('info')}<span data-i18n="lobby.academy">${t('lobby.academy')}</span></button>
           <div class="hero-stats">
             <div><span data-i18n="stat.biggest">${t('stat.biggest')}</span><b class="st-big">0</b></div>
             <div><span data-i18n="stat.rounds">${t('stat.rounds')}</span><b class="st-rounds">0</b></div>
@@ -150,7 +152,6 @@
       </div>`).join('')}
       <p class="disclaimer" data-i18n="lobby.disclaimer">${t('lobby.disclaimer')}</p>`;
     root.querySelector('.bonus-btn').onclick = () => openWheel();
-    root.querySelector('.academy-btn').onclick = () => { Sound.fx.click(); Tutor.academy(); };
     U.$$('.tile', root).forEach(a => {
       a.addEventListener('pointerenter', () => Sound.fx.hover());
       a.addEventListener('click', () => Sound.fx.click());
@@ -164,11 +165,11 @@
     const s = C.S.stats;
     const jp = Casino.Jackpots.values;
     for (const k in jp) { const el = root.querySelector('.fj-' + k); if (el) el.textContent = U.fmt(Math.floor(jp[k])) + '.' + String(Math.floor(jp[k] * 100) % 100).padStart(2, '0'); }
-    root.querySelector('.st-big').textContent = U.fmt(s.biggest);
-    root.querySelector('.st-rounds').textContent = U.fmt(s.rounds);
-    root.querySelector('.st-mult').textContent = s.bestMult ? s.bestMult + '×' : '—';
+    const set = (sel, v) => { const el = root.querySelector(sel); if (el) el.textContent = v; };
+    set('.st-big', U.fmt(s.biggest)); set('.st-rounds', U.fmt(s.rounds)); set('.st-mult', s.bestMult ? s.bestMult + '×' : '—');
     const left = LS.get('wheelAt', 0) + WHEEL_COOLDOWN - Date.now();
     const btn = root.querySelector('.bonus-btn'), sub = root.querySelector('.bonus-s');
+    if (!btn) return;
     if (left <= 0) { btn.disabled = false; btn.textContent = t('bonus.spin'); sub.textContent = t('bonus.ready'); root.querySelector('.bonus-card').classList.add('ready'); }
     else {
       btn.disabled = true;
@@ -178,7 +179,11 @@
       root.querySelector('.bonus-card').classList.remove('ready');
     }
   }
-  C.onLobby = refreshLobby;
+  C.onLobby = () => { refreshLobby(); Floor.enter(); };
+  Floor.hooks.wheel = () => { if (LS.get('wheelAt', 0) + WHEEL_COOLDOWN > Date.now()) C.toast(t('bonus.next') + ' ' + (document.querySelector('.bonus-btn') || {}).textContent); else openWheel(); };
+  // the floor only animates while it is on screen
+  const go = C.go;
+  C.go = function (id) { go.call(C, id); if (C.current !== 'lobby') Floor.stop(); };
 
   /* ---------- the floor: what everyone else is winning ---------- */
   const FEED_GAMES = ['caishen', 'caishen', 'treasure', 'treasure', 'slots', 'classic', 'crash', 'crash', 'roulette', 'baccarat', 'blackjack', 'sicbo', 'plinko', 'zhajinhua', 'niuniu', 'mahjong'];
@@ -201,6 +206,7 @@
   function pushFeed(e) {
     feed.unshift(e); feed.length = Math.min(feed.length, 6);
     paintFeed(true);
+    dispatchEvent(new CustomEvent('floorwin', { detail: e }));
   }
   function fakeWin() {
     const g = U.pick(FEED_GAMES), bet = U.pick(FEED_BETS), mult = feedMult(g);

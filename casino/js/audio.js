@@ -22,6 +22,8 @@
 
   function ensure() {
     if (!ctx) {
+      // browsers refuse audio before the first tap or key; wait for it instead of warning
+      if (navigator.userActivation && !navigator.userActivation.hasBeenActive) return null;
       const AC = window.AudioContext || window.webkitAudioContext;
       if (!AC) return null;
       ctx = new AC();
@@ -50,7 +52,13 @@
     return ctx;
   }
 
-  function tone({ f = 440, f2 = null, type = 'sine', t = 0, d = 0.2, v = 0.3, a = 0.005, det = 0, bus, lp = 0 }) {
+  // optional stereo placement for sounds that come from somewhere on the casino floor
+  function out(c, node, bus, pan) {
+    if (pan && c.createStereoPanner) { const p = c.createStereoPanner(); p.pan.value = Math.max(-1, Math.min(1, pan)); node.connect(p); p.connect(bus || sfxBus); }
+    else node.connect(bus || sfxBus);
+  }
+
+  function tone({ f = 440, f2 = null, type = 'sine', t = 0, d = 0.2, v = 0.3, a = 0.005, det = 0, bus, lp = 0, pan = 0 }) {
     const c = ensure(); if (!c) return;
     const t0 = c.currentTime + t;
     const o = c.createOscillator(), g = c.createGain();
@@ -62,11 +70,11 @@
     g.gain.exponentialRampToValueAtTime(0.0001, t0 + d);
     let last = o;
     if (lp) { const fl = c.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.value = lp; o.connect(fl); last = fl; }
-    last.connect(g); g.connect(bus || sfxBus);
+    last.connect(g); out(c, g, bus, pan);
     o.start(t0); o.stop(t0 + d + 0.05);
   }
 
-  function noise({ t = 0, d = 0.1, v = 0.3, type = 'bandpass', f = 2000, f2 = null, q = 1, a = 0.002, bus }) {
+  function noise({ t = 0, d = 0.1, v = 0.3, type = 'bandpass', f = 2000, f2 = null, q = 1, a = 0.002, bus, pan = 0 }) {
     const c = ensure(); if (!c) return;
     const t0 = c.currentTime + t;
     const s = c.createBufferSource(); s.buffer = noiseBuf;
@@ -77,7 +85,7 @@
     g.gain.setValueAtTime(0.0001, t0);
     g.gain.exponentialRampToValueAtTime(Math.max(0.0002, v), t0 + a);
     g.gain.exponentialRampToValueAtTime(0.0001, t0 + d);
-    s.connect(fl); fl.connect(g); g.connect(bus || sfxBus);
+    s.connect(fl); fl.connect(g); out(c, g, bus, pan);
     s.start(t0, Math.random() * 1.5); s.stop(t0 + d + 0.05);
   }
 
@@ -237,7 +245,37 @@
     shuffle() { for (let i = 0; i < 18; i++) noise({ t: i * 0.035, f: R(2500, 4500), q: 3, d: 0.03, v: 0.15 }); },
     wheelTick() { tone({ f: 2400, type: 'square', d: 0.012, v: 0.05, lp: 6000 }); noise({ f: 4000, q: 5, d: 0.015, v: 0.15 }); },
     error() { tone({ f: 200, type: 'square', d: 0.08, v: 0.06, lp: 1200 }); tone({ f: 160, type: 'square', t: 0.09, d: 0.12, v: 0.06, lp: 1200 }); },
-    open() { noise({ f: 800, f2: 2000, q: 1, d: 0.25, v: 0.15 }); tone({ f: NOTE(79), t: 0.05, d: 0.3, v: 0.06 }); }
+    open() { noise({ f: 800, f2: 2000, q: 1, d: 0.25, v: 0.15 }); tone({ f: NOTE(79), t: 0.05, d: 0.3, v: 0.06 }); },
+
+    /* ---- the floor ---- */
+    // 0 = carpet (soft), 1 = marble / wood (click)
+    step(hard = 1) {
+      if (hard) { noise({ f: R(2600, 3400), q: 3, d: 0.035, v: 0.07 }); tone({ f: R(140, 180), f2: 80, d: 0.05, v: 0.06 }); }
+      else noise({ type: 'lowpass', f: R(500, 700), d: 0.06, v: 0.06 });
+    },
+    // a machine somewhere on the floor; pan -1..1, v 0..1 by distance
+    slotSpin(pan = 0, v = 1) {
+      if (v < 0.05) return;
+      for (let i = 0; i < 3; i++) tone({ f: NOTE(84 + i * 4), type: 'triangle', t: i * 0.06, d: 0.12, v: 0.025 * v, pan });
+      noise({ t: 0.1, f: 1800, q: 1.5, d: 0.7, v: 0.04 * v, pan });
+    },
+    slotWin(pan = 0, v = 1, big = false) {
+      if (v < 0.05) return;
+      const n = big ? 14 : 6;
+      for (let i = 0; i < n; i++) tone({ f: NOTE([79, 83, 86, 91][i % 4] + (big ? 2 : 0)), type: 'triangle', t: i * 0.07, d: 0.18, v: 0.05 * v, pan });
+      for (let i = 0; i < (big ? 20 : 8); i++) { tone({ f: R(1700, 2300), t: 0.1 + i * 0.05, d: 0.12, v: 0.035 * v, pan }); }
+    },
+    zone() { tone({ f: NOTE(81), d: 0.5, v: 0.03 }); tone({ f: NOTE(88), t: 0.06, d: 0.6, v: 0.025 }); },
+    doors() { noise({ type: 'lowpass', f: 900, f2: 300, d: 0.9, v: 0.12 }); tone({ f: NOTE(84), t: 0.2, d: 0.8, v: 0.04 }); tone({ f: NOTE(91), t: 0.3, d: 1, v: 0.03 }); },
+    splash() { for (let i = 0; i < 6; i++) noise({ t: i * 0.04, f: R(1500, 4000), q: 1.2, d: 0.12, v: 0.08 }); tone({ f: 600, f2: 1400, d: 0.12, v: 0.05 }); },
+    glass() { tone({ f: 3100, d: 0.6, v: 0.05 }); tone({ f: 4650, t: 0.01, d: 0.4, v: 0.03 }); noise({ f: 6000, q: 6, d: 0.03, v: 0.1 }); },
+    pour() { noise({ f: 900, f2: 1600, q: 2, d: 0.8, v: 0.08 }); },
+    cashReg() { tone({ f: NOTE(96), d: 0.5, v: 0.08 }); tone({ f: NOTE(100), t: 0.08, d: 0.6, v: 0.07 }); noise({ type: 'lowpass', f: 1500, d: 0.15, v: 0.2 }); },
+    phoneBuzz() { for (let i = 0; i < 2; i++) tone({ f: 170, type: 'square', t: i * 0.32, d: 0.22, v: 0.05, lp: 400 }); },
+    notify() { tone({ f: NOTE(88), d: 0.2, v: 0.06 }); tone({ f: NOTE(93), t: 0.1, d: 0.35, v: 0.06 }); },
+    alarm() { for (let i = 0; i < 4; i++) tone({ f: i % 2 ? 660 : 880, type: 'square', t: i * 0.16, d: 0.14, v: 0.04, lp: 2000 }); },
+    knock() { [0, 0.18, 0.36].forEach(t => { tone({ t, f: 110, f2: 60, d: 0.1, v: 0.4 }); noise({ t, type: 'lowpass', f: 600, d: 0.05, v: 0.3 }); }); },
+    cheer(v = 1) { for (let i = 0; i < 10; i++) noise({ t: i * 0.04, f: R(600, 1800), q: 1.5, d: 0.5, v: 0.03 * v }); }
   };
 
   const loops = {
@@ -273,8 +311,19 @@
       };
     },
     whirr() { return loopNoise({ type: 'bandpass', f: 500, q: 0.7, v: 0.05 }); },
-    roll() { return loopNoise({ type: 'bandpass', f: 1800, q: 1.4, v: 0.07 }); }
+    roll() { return loopNoise({ type: 'bandpass', f: 1800, q: 1.4, v: 0.07 }); },
+    // the room: a low crowd murmur with the odd far-off machine chime
+    room() {
+      const c = ensure(); if (!c) return { set() {}, stop() {} };
+      const a = loopNoise({ type: 'bandpass', f: 420, q: 0.9, v: 0.022 }), b = loopNoise({ type: 'bandpass', f: 1100, q: 2, v: 0.008 });
+      const iv = setInterval(() => {
+        b.set(R(900, 1400), R(0.004, 0.012));
+        if (Math.random() < 0.35) tone({ f: NOTE(R(84, 96) | 0), type: 'triangle', d: 0.25, v: 0.008, pan: R(-0.9, 0.9) });
+      }, 700);
+      return { set(v) { a.set(null, 0.022 * v); }, stop() { clearInterval(iv); a.stop(0.6); b.stop(0.6); } };
+    }
   };
+  let amb = null;
 
   /* ---------- Lounge music: Ebmaj9 - Cm9 - Fm9 - Bb13, swung ---------- */
   const prog = [
@@ -364,7 +413,12 @@
     },
     setVoice(on) { st.voice = on; LS.set('voice', on); if (!on) try { speechSynthesis.cancel(); } catch (e) { /* ignore */ } },
     duck,
-    say
+    say,
+    // crowd murmur while the casino floor is on screen
+    ambience(on) {
+      if (on && !amb && st.sfx && ctx) amb = loops.room();
+      else if (!on && amb) { amb.stop(); amb = null; }
+    }
   };
   try { window.speechSynthesis && speechSynthesis.getVoices(); } catch (e) { /* ignore */ }
 })();
