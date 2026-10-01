@@ -57,10 +57,12 @@
     register(g) { C.games[g.id] = g; },
 
     /* ---------- wallet ---------- */
-    take(amount) {
+    // force: the engine already checked the balance (live tables), never refuse
+    take(amount, force) {
       amount = Math.floor(amount);
       if (amount <= 0) return true;
-      if (S.balance < amount) { C.noFunds(); return false; }
+      if (S.balance < amount && !force) { C.noFunds(); return false; }
+      amount = Math.min(amount, S.balance);
       S.balance -= amount; S.stats.wagered += amount;
       shown -= amount; paint();
       U.pulse(balWrap(), 'down');

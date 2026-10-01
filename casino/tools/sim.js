@@ -1,5 +1,5 @@
 // RTP simulator for the math models: node casino/tools/sim.js
-const M = require('../js/games/slots-math.js');
+const M = require('../js/engine/fortune7-math.js');
 const rnd = Math.random;
 function slots(N = 2e6) {
   let bet = 0, ret = 0, hits = 0, fsTrig = 0, big = 0;
