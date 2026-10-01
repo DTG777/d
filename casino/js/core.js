@@ -69,6 +69,17 @@
       addXp(amount); save(); checkBroke();
       return true;
     },
+    // money that leaves the table: food, drinks, rooms, tips. Not a wager, no XP
+    spend(amount, from) {
+      amount = Math.floor(amount);
+      if (amount <= 0) return true;
+      if (S.balance < amount) { C.noFunds(); return false; }
+      S.balance -= amount; S.stats.spent = (S.stats.spent || 0) + amount;
+      shown -= amount; paint(); U.pulse(balWrap(), 'down');
+      if (from) { const pt = from.nodeType ? U.center(from) : from; FX.float(pt.x, pt.y - 10, '-' + U.fmt(amount), 'bad'); }
+      save(); checkBroke();
+      return true;
+    },
     refund(amount) {
       amount = Math.floor(amount); if (amount <= 0) return;
       S.balance += amount; S.stats.wagered = Math.max(0, S.stats.wagered - amount);

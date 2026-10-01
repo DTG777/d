@@ -46,6 +46,15 @@ for (const m of FLOOR.matchAll(/'sign', '(\w+)'/g)) keys.add('zone.' + m[1]);
 ['hao', 'ling', 'oldk', 'mei', 'ace', 'fei'].forEach(k => keys.add('fl.p.' + k));
 ['bartender', 'cashier', 'club', 'host', 'chef', 'lotto', 'concierge', 'shop', 'hotel', 'bell', 'doorman', 'pianist'].forEach(k => keys.add('fl.hi.' + k));
 ['taken', 'marquee.slots', 'marquee.pit', 'music.on', 'music.off', 'vipSub', 'pvpSub', 'use', 'play'].forEach(k => keys.add('fl.' + k));
+// services: menus and tiers
+const SV = fs.readFileSync(path.join(__dirname, '../js/services.js'), 'utf8');
+for (const [list, a, b] of [['FOOD', 'f', 'fd'], ['BAR', 'd', 'dd'], ['ROOMS', 'h', 'hd'], ['WEAR', 'w', 'wd'], ['ACC', 'w', 'wd']]) {
+  const block = SV.match(new RegExp('const ' + list + ' = \\[([\\s\\S]*?)\\n  \\];'))[1];
+  for (const m of block.matchAll(/id: '(\w+)'/g)) { keys.add('sv.' + a + '.' + m[1]); keys.add('sv.' + b + '.' + m[1]); }
+}
+for (let i = 0; i < 5; i++) { keys.add('sv.tier.' + i); keys.add('sv.perk.' + i); }
+for (let i = 1; i <= 6; i++) keys.add('sv.wish.' + i);
+['water', 'pour'].forEach(k => keys.add('sv.bt.' + k));
 let bad = 0;
 for (const k of [...keys].filter(k => !k.endsWith('.'))) for (const l of ['zh', 'en']) if (D[l][k] == null) { console.log('missing', l, k); bad++; }
 for (const k of Object.keys(D.zh)) if (D.en[k] == null) { console.log('en lacks', k); bad++; }

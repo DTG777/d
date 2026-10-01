@@ -1503,7 +1503,7 @@
     const host = wrap.querySelector('.fl-pills');
     const v = window.Services && Services.vit ? Services.vit() : null;
     const debt = window.Story && Story.debt ? Story.debt() : 0;
-    const clock = window.Story && Story.clock ? Story.clock() : '';
+    const clock = window.Story && Story.clock ? Story.clock() : window.Services && Services.clock ? Services.clock() : '';
     let h = '';
     if (v) {
       h += `<span class="fl-pill ${v.energy < 25 ? 'bad' : ''}" title="${t('vit.energy')}">${svg('bolt')}<i style="--v:${v.energy}%"></i></span>`;
@@ -1698,6 +1698,15 @@
     you: () => you,
     coins: (n = 18) => coins(you.x, you.y - 20, n),
     cheer() { you.cheerT = now; },
+    // everyone near you throws their hands up
+    crowd(r = 9) { for (const a of ACT) if (!a.seated || a.persona) if (Math.hypot(a.x - you.x, a.y - you.y) < r * T) a.cheerT = now + U.rand(0, 0.3); you.cheerT = now; },
+    // paint a character into any canvas (boutique mirror, phone avatar)
+    portrait(c, look, d = 0) {
+      const keep = g, k = c.width / 40;
+      g = c.getContext('2d'); g.setTransform(k, 0, 0, k, 0, 0); g.clearRect(0, 0, 40, 50);
+      drawChar({ look, x: 20, y: 47, dir: d, wp: 0, seed: 1, moving: false }, now);
+      g.setTransform(1, 0, 0, 1, 0, 0); g = keep;
+    },
     refreshLook() { you.look = Object.assign({ skin: '#e8b88f', hair: '#14100c', hs: 0, top: '#1f3a5f', bot: '#22262e' }, LS.get('look', {})); },
     // story characters walk the floor: { look, tx, ty, talk, name }
     spawn(spec) {
