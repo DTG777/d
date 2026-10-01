@@ -179,7 +179,7 @@
       this.order = seats.map(s => s.id);
       seats.forEach(s => {
         const pol = s.policy === 'bot' ? (obs => e.bot(obs, this.rng)) : s.policy;
-        this.seats[s.id] = { id: s.id, name: s.name || s.id, balance: s.balance != null ? s.balance : 10000, policy: pol || null, stats: { rounds: 0, wagered: 0, returned: 0 } };
+        this.seats[s.id] = { id: s.id, name: s.name || s.id, balance: s.balance != null ? s.balance : 10000, policy: pol || null, meta: s.meta || {}, stats: { rounds: 0, wagered: 0, returned: 0 } };
       });
       this.jackpots = jackpots || { mini: 500, minor: 2500, major: 25000, grand: 250000 };
       this.state = e.init(this.rng, { seats: this.order, ...opts });

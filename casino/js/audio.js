@@ -335,15 +335,17 @@
   }
 
   /* ---------- Voice ---------- */
-  function say(text) {
+  // opts: { pitch, rate, female } gives each character at the table its own voice
+  function say(text, opts = {}) {
     if (!st.voice || !window.speechSynthesis || !text) return;
     try {
       const zh = (window.I18N && I18N.lang === 'zh');
       const u = new SpeechSynthesisUtterance(text);
       u.lang = zh ? 'zh-CN' : 'en-US';
-      u.rate = zh ? 1.05 : 1.0; u.pitch = 0.85; u.volume = 1;
+      u.rate = opts.rate || (zh ? 1.05 : 1.0); u.pitch = opts.pitch || 0.85; u.volume = 1;
       const voices = speechSynthesis.getVoices().filter(v => v.lang && v.lang.toLowerCase().startsWith(zh ? 'zh' : 'en'));
-      if (voices.length) u.voice = voices.find(v => /male|daniel|yunxi|kangkang|google/i.test(v.name)) || voices[0];
+      const fem = /female|xiaoxiao|xiaoyi|tingting|meijia|samantha|victoria|karen|zira|susan/i, male = /male|daniel|yunxi|yunyang|kangkang|alex|fred|david|google/i;
+      if (voices.length) u.voice = (opts.female ? voices.find(v => fem.test(v.name)) : voices.find(v => male.test(v.name) && !fem.test(v.name))) || voices[0];
       speechSynthesis.cancel();
       speechSynthesis.speak(u);
     } catch (e) { /* speech unavailable */ }

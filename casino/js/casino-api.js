@@ -6,6 +6,8 @@
      Casino.act(id, action, seat?)           -> Promise<{ ok, events, obs }>
                                              for "you" it plays through the on-screen table, with animation
      Casino.join(id, { name, policy })       seat an agent at a live table (policy: obs => action | Promise)
+     Casino.say(id, text)                    talk at the table; opponents may answer (or lie)
+     Casino.ai.set({ baseURL, apiKey, model, seats })  let a language model play house seats (key stays on this device)
      Casino.on(type, fn)                     every engine event, plus 'balance', 'jackpot', 'join', 'leave'
      Casino.tools() / Casino.call(name, in)  function-calling tools + dispatcher for LLM agents
      Casino.sim(id, opts)                    headless Engines.Session for instant simulations
@@ -41,11 +43,24 @@
 
   /* ---------- live tables ---------- */
   const lives = {};
-  const HOUSE = [
-    { name: { zh: '阿豪', en: 'Hao' }, av: '豪', color: '#e2574c' }, { name: { zh: '玲姐', en: 'Ling' }, av: '玲', color: '#6fb7ff' },
-    { name: { zh: '老K', en: 'Old K' }, av: 'K', color: '#35d49a' }, { name: { zh: '小美', en: 'Mei' }, av: '美', color: '#f39bd0' },
-    { name: { zh: '赌神', en: 'Ace' }, av: '神', color: '#f6c94e' }, { name: { zh: '大飞', en: 'Fei' }, av: '飞', color: '#b48cff' }
-  ];
+  const B = E.Brain;
+  const PIDS = ['hao', 'ling', 'oldk', 'mei', 'ace', 'fei'];
+  const HOUSE = PIDS.map(id => ({ persona: id, ...B.PERSONAS[id] }));
+
+  /* ---------- AI opponents: config lives only in this browser's storage ---------- */
+  const AI_DEF = { enabled: false, baseURL: '', apiKey: '', model: '', seats: 1 };
+  const ai = {
+    get: () => Object.assign({}, AI_DEF, LS.get('ai', {})),
+    set(cfg) { LS.set('ai', Object.assign(ai.get(), cfg)); for (const id in lives) lives[id].rebrain(); emit('ai', { enabled: ai.on() }); },
+    on() { const c = ai.get(); return !!(c.enabled && c.baseURL && c.apiKey && c.model); },
+    // one tiny round trip to check the endpoint, key and model
+    async test() {
+      const c = ai.get();
+      const text = await B.callModel(c, 'Reply with the single word: ok', [{ role: 'user', content: 'ping' }], 10);
+      return text.trim();
+    }
+  };
+
   const randomSeed = () => { const a = new Uint32Array(2); try { crypto.getRandomValues(a); } catch (e) { a[0] = Date.now(); a[1] = Math.random() * 1e9; } return a[0].toString(36) + a[1].toString(36); };
 
   class Live {
@@ -63,13 +78,52 @@
       const h = HOUSE[(i + this.id.length) % HOUSE.length];
       const key = this.id + ':' + seat;
       if (!(wallets[key] > 2000)) wallets[key] = 200000;
-      return { id: seat, name: h.name[I18N.lang] || h.name.en, balance: wallets[key], policy: 'bot', meta: { ...h, house: true } };
+      return { id: seat, name: h.name[I18N.lang] || h.name.en, balance: wallets[key], policy: this.brain(h.persona, i), meta: { ...h, house: true } };
     }
+    // a persona brain for a house chair: scripted, or a language model for the first `seats` chairs when AI is on
+    brain(persona, i) {
+      const lang = () => I18N.lang, c = ai.get();
+      if (this.e.mode === 'pvp' && ai.on() && i < (c.seats || 1)) {
+        return B.llm(this.id, persona, c, { lang, onThought: text => emit('thought', { game: this.id, persona, text }) });
+      }
+      return this.e.mode === 'pvp' ? B.scripted(this.id, persona, { lang }) : (obs => this.e.bot(obs, this.table ? this.table.rng : Math.random));
+    }
+    rebrain() {
+      if (this.e.mode !== 'pvp') return;
+      this.table.order.forEach((id, k) => {
+        const s = this.table.seats[id];
+        if (id !== 'you' && s.meta && s.meta.house) s.policy = this.brain(s.meta.persona, k - 1);
+      });
+    }
+    // house chairs speak in reaction to what just happened (a win, a bomb, your chat); at most one voice per moment
+    react(events) {
+      const out = [];
+      for (const id of this.table.order) {
+        const s = this.table.seats[id];
+        if (id === 'you' || !s.policy || !s.policy.react || out.length) continue;
+        for (const ev of E.Table.visible(events, id)) {
+          if (ev.seat === id && ev.t === 'say') continue;
+          const text = s.policy.react(ev, id);
+          if (text) { const r = this.table.say(id, text); out.push(r.events[0]); break; }
+        }
+      }
+      return out;
+    }
+    get brains() { return this.table.order.filter(id => id !== 'you').map(id => ({ seat: id, kind: this.table.seats[id].policy && this.table.seats[id].policy.kind || 'bot', persona: this.table.seats[id].meta && this.table.seats[id].meta.persona })); }
     seat(id) { return this.table.seats[id]; }
     get seatIds() { return this.table.order; }
     sync() { this.table.seats.you.balance = C.S.balance + this.pending; }
     observe(seat = 'you') { this.sync(); return this.table.observe(seat); }
     legal(seat = 'you') { this.sync(); return this.table.legal(seat); }
+    // a house player who went bust buys back in, like a regular would
+    rebuy(events) {
+      for (const id of this.table.order) {
+        const s = this.table.seats[id];
+        if (id === 'you' || this.agents[id] || s.balance >= 20000) continue;
+        s.balance += 200000;
+        events.push({ t: 'rebuy', seat: id, amount: 200000 });
+      }
+    }
     persist() { for (const id of this.table.order) if (id !== 'you' && this.agents[id] == null) wallets[this.id + ':' + id] = this.table.seats[id].balance; saveWallets(); }
 
     /* apply one action; for "you" the wallet moves: stakes leave now, winnings wait in
@@ -88,6 +142,8 @@
         }
       }
       if (r.jackpots) r.jackpots.forEach(j => Jackpots.hit(j.tier));
+      if (r.done) this.rebuy(r.all);
+      if (this.e.mode === 'pvp') { const talk = this.react(r.all); r.all.push(...talk); }
       r.screen = E.Table.visible(r.all, 'you'); // what the human's screen may show
       for (const ev of r.screen) {
         if (ev.t === 'settle' && ev.seat === 'you') C.record(ev.ret || 0, ev.bet || 0);
@@ -104,13 +160,17 @@
       return p;
     }
     // ask agent / house seats for their moves until it is your turn (pvp) or everyone is ready (shared)
-    async runOthers(onEvents, { maxSteps = 400 } = {}) {
+    async runOthers(onEvents, { maxSteps = 400, onThink } = {}) {
       const all = [];
       if (this.e.mode === 'pvp') {
         for (let i = 0; i < maxSteps; i++) {
           const s = this.table.turn();
           if (!s || s === 'you') break;
+          if (!this.legal(s).length) break;
+          emit('thinking', { game: this.id, seat: s });
+          const thinking = onThink ? onThink(s, this.table.seats[s].policy && this.table.seats[s].policy.kind) : null;
           const a = await this.decide(s);
+          if (thinking) await thinking;
           const r = this.step(a, s);
           if (!r.ok) { console.warn('agent', s, 'illegal', r.error); const fb = this.e.bot(this.observe(s), this.table.rng); const r2 = this.step(fb, s); all.push(...r2.screen); if (onEvents) await onEvents(r2.screen, s); continue; }
           all.push(...r.screen);
@@ -184,6 +244,30 @@
       return r;
     },
     join: (id, opts) => live(id).join(opts),
+    ai,
+    /* talk at a table. Returns the replies (each arrives after a human-like pause and is
+       also emitted as a 'say' event). Opponents may answer honestly, deflect, or lie. */
+    async say(id, text, seat = 'you') {
+      const L = live(id), r = L.table.say(seat, text);
+      if (!r.ok) return r;
+      const ev = r.events[0];
+      emit('say', { game: id, ...ev });
+      const replies = [];
+      const others = L.table.order.filter(s => s !== seat && L.table.seats[s].policy && (L.table.seats[s].policy.reply || L.table.seats[s].policy.react));
+      U.shuffle(others);
+      for (const s of others.slice(0, 2)) {
+        const pol = L.table.seats[s].policy;
+        let answer = null;
+        if (pol.reply) answer = await pol.reply(L.observe(s), ev);
+        else { await U.sleep(U.rand(700, 1600)); answer = pol.react(ev, s); }
+        if (!answer) continue;
+        const said = L.table.say(s, answer).events[0];
+        emit('say', { game: id, ...said, reply: true });
+        replies.push(said);
+        if (!pol.reply) break; // one scripted voice is plenty
+      }
+      return { ok: true, events: [ev, ...replies] };
+    },
     leave: (id, seat) => live(id).leave(seat),
     tools: () => A.tools(), openaiTools: () => A.openaiTools(), actionSchema: A.actionSchema,
     call: (name, input) => A.handler(Casino)(name, input),

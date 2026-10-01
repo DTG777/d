@@ -6,14 +6,19 @@
   const PRIZE_W = [14, 9, 14, 5, 14, 2.5, 14, 9, 11, 1, 14, 0.4];
 
   const GAMES = [
-    { id: 'slots', rtp: '≈ 95%', hot: true },
-    { id: 'blackjack', rtp: '≈ 99.4%' },
-    { id: 'roulette', rtp: '97.3%' },
-    { id: 'baccarat', rtp: '98.9%' },
-    { id: 'sicbo', rtp: '97.2%' },
-    { id: 'crash', rtp: '97%', hot: true },
-    { id: 'plinko', rtp: '≈ 99%' }
+    { id: 'zhajinhua', sec: 'cardroom', ai: true, hot: true },
+    { id: 'doudizhu', sec: 'cardroom', ai: true },
+    { id: 'mahjong', sec: 'cardroom', ai: true },
+    { id: 'niuniu', sec: 'cardroom', ai: true },
+    { id: 'slots', sec: 'slots', rtp: '≈ 95%', hot: true },
+    { id: 'blackjack', sec: 'tables', rtp: '≈ 99.4%' },
+    { id: 'roulette', sec: 'tables', rtp: '97.3%' },
+    { id: 'baccarat', sec: 'tables', rtp: '98.9%' },
+    { id: 'sicbo', sec: 'tables', rtp: '97.2%' },
+    { id: 'crash', sec: 'instant', rtp: '97%', hot: true },
+    { id: 'plinko', sec: 'instant', rtp: '≈ 99%' }
   ];
+  const SECTIONS = ['cardroom', 'slots', 'tables', 'instant'];
 
   /* ---------- tile art (inline SVG) ---------- */
   function art(id) {
@@ -26,6 +31,21 @@
       case 'slots': return `<svg viewBox="0 0 160 100"><rect x="14" y="18" width="132" height="64" rx="10" fill="#120b06" stroke="#d9a441" stroke-width="3"/>
         ${[0, 1, 2].map(i => `<rect x="${22 + i * 40}" y="25" width="36" height="50" rx="4" fill="#f7efdc"/><svg x="${24 + i * 40}" y="32" width="32" height="36" viewBox="0 0 100 100"><use href="#sym-5"/></svg>`).join('')}
         <path d="M14 50 h-6 M146 50 h6" stroke="#f6c94e" stroke-width="3"/></svg>`;
+      case 'zhajinhua': return `<svg viewBox="0 0 160 100">${card(56, 54, -16, 'A', '♠', 0)}${card(80, 50, 0, 'A', '♥', 1)}${card(104, 54, 16, 'A', '♦', 1)}
+        <text x="80" y="96" text-anchor="middle" font-family="'ZCOOL QingKe HuangYou', sans-serif" font-size="16" fill="#f6c94e">豹子</text></svg>`;
+      case 'niuniu': return `<svg viewBox="0 0 160 100">${[['K', '♠', 0], ['Q', '♥', 1], ['J', '♣', 0], ['T', '♦', 1], ['K', '♥', 1]].map(([r, su, red], i) => card(40 + i * 20, 52, (i - 2) * 8, r === 'T' ? '10' : r, su, red)).join('')}
+        <text x="80" y="97" text-anchor="middle" font-family="'ZCOOL QingKe HuangYou', sans-serif" font-size="17" fill="#f6c94e">五花牛</text></svg>`;
+      case 'doudizhu': return `<svg viewBox="0 0 160 100">${card(64, 46, -10, '2', '♠', 0)}
+        <g transform="translate(96 44) rotate(10)"><rect x="-22" y="-31" width="44" height="62" rx="5" fill="#fff4dc" stroke="#c9b58a"/>
+        <text x="-15" y="-10" font-family="'Barlow Semi Condensed', sans-serif" font-weight="800" font-size="8" fill="#c8283c" writing-mode="tb">JOKER</text>
+        <text x="4" y="14" text-anchor="middle" font-family="'ZCOOL QingKe HuangYou', sans-serif" font-size="20" fill="#c8283c">大王</text></g>
+        <text x="80" y="97" text-anchor="middle" font-family="'ZCOOL QingKe HuangYou', sans-serif" font-size="16" fill="#f6c94e">斗地主</text></svg>`;
+      case 'mahjong': {
+        const tl = (x, y, rot, n, su, col) => `<g transform="translate(${x} ${y}) rotate(${rot})"><rect x="-17" y="-24" width="34" height="48" rx="5" fill="#fbf6ea" stroke="#c9b58a"/><rect x="-17" y="18" width="34" height="6" rx="2" fill="#1f7a55"/>
+          <text x="0" y="-1" text-anchor="middle" font-family="'ZCOOL QingKe HuangYou', sans-serif" font-size="18" fill="${col}">${n}</text><text x="0" y="15" text-anchor="middle" font-family="'ZCOOL QingKe HuangYou', sans-serif" font-size="13" fill="${col === '#15110e' ? '#c8283c' : col}">${su}</text></g>`;
+        return `<svg viewBox="0 0 160 100">${tl(46, 54, -8, '一', '万', '#15110e')}${tl(80, 50, 0, '5', '条', '#157a4c')}${tl(114, 54, 8, '9', '筒', '#1f4fa8')}
+          <text x="80" y="97" text-anchor="middle" font-family="'ZCOOL QingKe HuangYou', sans-serif" font-size="16" fill="#f6c94e">血战到底</text></svg>`;
+      }
       case 'blackjack': return `<svg viewBox="0 0 160 100">${card(64, 52, -12, 'A', '♠', 0)}${card(96, 50, 10, 'K', '♥', 1)}
         <circle cx="126" cy="80" r="11" fill="#c8283c" stroke="#fff" stroke-dasharray="4 3" stroke-width="2"/><circle cx="126" cy="76" r="11" fill="#1f4fa8" stroke="#fff" stroke-dasharray="4 3" stroke-width="2"/></svg>`;
       case 'roulette': {
@@ -91,17 +111,19 @@
           </div>
         </div>
       </div>
+      ${SECTIONS.map(sec => `
+      <div class="lobby-sec"><h2 data-i18n="lobby.${sec}">${t('lobby.' + sec)}</h2><p data-i18n="lobby.${sec}Sub">${t('lobby.' + sec + 'Sub')}</p></div>
       <div class="lobby-grid">
-        ${GAMES.map(g => `
+        ${GAMES.filter(g => g.sec === sec).map(g => `
           <a class="tile tile-${g.id}" href="#${g.id}">
             <div class="tile-art">${art(g.id)}</div>
             <div class="tile-info">
               <div class="tile-name" data-i18n="game.${g.id}">${t('game.' + g.id)}</div>
               <div class="tile-tag" data-i18n="tag.${g.id}">${t('tag.' + g.id)}</div>
-              <div class="tile-meta"><span class="rtp">RTP ${g.rtp}</span>${g.hot ? `<span class="hot" data-i18n="lobby.hot">${t('lobby.hot')}</span>` : ''}</div>
+              <div class="tile-meta">${g.rtp ? `<span class="rtp">RTP ${g.rtp}</span>` : `<span class="rtp" data-i18n="lobby.noRake">${t('lobby.noRake')}</span>`}${g.ai ? `<span class="ai-badge" data-i18n="lobby.withAI">${t('lobby.withAI')}</span>` : ''}${g.hot ? `<span class="hot" data-i18n="lobby.hot">${t('lobby.hot')}</span>` : ''}</div>
             </div>
           </a>`).join('')}
-      </div>
+      </div>`).join('')}
       <p class="disclaimer" data-i18n="lobby.disclaimer">${t('lobby.disclaimer')}</p>`;
     root.querySelector('.bonus-btn').onclick = () => openWheel();
     U.$$('.tile', root).forEach(a => {
@@ -202,6 +224,7 @@
       ${row('set-music', 'set.music', st.music)}
       ${row('set-voice', 'set.voice', st.voice)}
       <div class="set-row"><span>${t('set.lang')}</span><div class="seg"><button class="seg-btn ${I18N.lang === 'zh' ? 'on' : ''}" data-l="zh">中文</button><button class="seg-btn ${I18N.lang === 'en' ? 'on' : ''}" data-l="en">English</button></div></div>
+      <div class="set-row"><span>${t('set.ai')} <small class="ai-on-lab">${Casino.ai.on() ? '· ON' : ''}</small></span><button class="btn btn-ghost btn-sm set-ai">${t('set.aiOpen')}</button></div>
       <h3>${t('set.stats')}</h3>
       <dl class="stats-grid">
         <dt>${t('stat.level')}</dt><dd>${C.S.level}</dd>
@@ -218,10 +241,35 @@
     body.querySelector('#set-music').onchange = e => { Sound.setMusic(e.target.checked); Sound.unlock(); };
     body.querySelector('#set-voice').onchange = e => { Sound.setVoice(e.target.checked); if (e.target.checked) Sound.say(t('set.voiceOn')); };
     U.$$('[data-l]', body).forEach(b => b.onclick = () => { setLang(b.dataset.l); close(); openSettings(); });
+    body.querySelector('.set-ai').onclick = () => { close(); openAI(); };
     const reset = body.querySelector('.set-reset');
     reset.onclick = () => {
       if (!reset.classList.contains('confirm')) { reset.classList.add('confirm'); reset.textContent = t('set.resetConfirm'); Sound.fx.error(); return; }
       LS.clear(); location.hash = 'lobby'; location.reload();
+    };
+  }
+
+  /* ---------- AI opponents: a language model takes a house seat ---------- */
+  function openAI() {
+    const c = Casino.ai.get();
+    const esc = v => String(v || '').replace(/[&"<>]/g, ch => ({ '&': '&amp;', '"': '&quot;', '<': '&lt;', '>': '&gt;' }[ch]));
+    const body = U.h('div', { class: 'settings ai-set', html: `
+      <p class="fine">${t('ai.lead')}</p>
+      <label class="set-row" for="ai-on"><span>${t('ai.enable')}</span><span class="switch"><input type="checkbox" id="ai-on" ${c.enabled ? 'checked' : ''}><span class="sw"></span></span></label>
+      <label>${t('ai.base')}<input type="url" id="ai-base" placeholder="https://api.anthropic.com" value="${esc(c.baseURL)}" autocomplete="off" spellcheck="false"></label>
+      <label>${t('ai.key')}<input type="password" id="ai-key" value="${esc(c.apiKey)}" autocomplete="off" spellcheck="false"></label>
+      <label>${t('ai.model')}<input type="text" id="ai-model" placeholder="claude-sonnet-5-5" value="${esc(c.model)}" autocomplete="off" spellcheck="false"></label>
+      <label>${t('ai.seats')}<select id="ai-seats">${[1, 2, 3, 4].map(n => `<option ${n === c.seats ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
+      <div class="ai-row"><button class="btn btn-ghost btn-sm ai-test">${t('ai.test')}</button><span class="ai-status" aria-live="polite"></span></div>
+      <p class="fine">${t('ai.note')}</p>` });
+    const $ = s => body.querySelector(s);
+    const read = () => ({ enabled: $('#ai-on').checked, baseURL: $('#ai-base').value.trim().replace(/\/+$/, ''), apiKey: $('#ai-key').value.trim(), model: $('#ai-model').value.trim(), seats: +$('#ai-seats').value });
+    C.modal({ title: t('ai.title'), body, actions: [{ label: t('ai.save'), primary: true, onClick: close => { Casino.ai.set(read()); C.toast(t('ai.saved'), 'good'); close(); } }] });
+    $('.ai-test').onclick = async () => {
+      const st = $('.ai-status'); st.className = 'ai-status'; st.textContent = t('ai.testing');
+      Casino.ai.set(Object.assign(read(), { enabled: true }));
+      try { const r = await Casino.ai.test(); st.textContent = t('ai.ok', { r: r.slice(0, 40) }); st.classList.add('good'); $('#ai-on').checked = true; }
+      catch (e) { st.textContent = t('ai.fail', { e: String(e.message || e).slice(0, 140) }); st.classList.add('bad'); Casino.ai.set(read()); }
     };
   }
 

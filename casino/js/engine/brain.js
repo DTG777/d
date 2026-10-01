@@ -121,8 +121,9 @@
   /* ---------- scripted brain ---------- */
   function scripted(game, personaId = 'hao', { lang = 'zh', rng = Math.random } = {}) {
     const e = E.list[game], P = PERSONAS[personaId] || PERSONAS.hao;
-    const L = (key, vars) => line(key, lang, rng, vars || {}, personaId);
-    let losing = 0, greeted = false;
+    const lg = () => typeof lang === 'function' ? lang() : lang; // lang may be a getter so the voice follows the UI language
+    const L = (key, vars) => line(key, lg(), rng, vars || {}, personaId);
+    let losing = 0;
     const policy = obs => {
       let a = e.bot(obs, rng);
       const has = t => obs.legal.find(l => l.type === t);
@@ -132,14 +133,14 @@
       if (game === 'zhajinhua' && a.type === 'fold' && s != null && s > 0.35 && rng() < P.bluff * 0.5 && has('call')) a = { type: 'call' };
       if (game === 'niuniu' && a.type === 'bet' && losing >= 2) { const en = has('bet').params.mult.enum; a = { type: 'bet', mult: en[en.length - 1] }; }
       // talk
-      let say = null;
-      if (!greeted && rng() < P.chatty) { greeted = true; if (rng() < 0.5) say = L('greet'); }
+      let say = null, tell = null;
+      if (!policy.greeted && rng() < P.chatty) { policy.greeted = true; if (rng() < 0.5) say = L('greet'); }
       const loud = AGGRESSIVE[a.type] && !(a.type === 'grab' && a.mult === 0) && !(a.type === 'bid' && a.score < 2);
       if (!say && rng() < P.chatty * (loud ? 0.55 : 0.18)) {
         if (losing >= 3 && rng() < 0.5) say = L('tilt');
-        else if (loud && s != null && s < 0.5) say = L('bluff');                         // weak, acting strong
+        else if (loud && s != null && s < 0.5) { say = L('bluff'); tell = 'bluff'; }                         // weak, acting strong
         else if (loud && s != null && s > 0.85) say = rng() < P.honest ? L('strongTalk') : L('taunt');
-        else if (a.type === 'call' && s != null && s > 0.85) say = L('sandbag');          // strong, acting weak
+        else if (a.type === 'call' && s != null && s > 0.85) { say = L('sandbag'); tell = 'sandbag'; }          // strong, acting weak
         else if (a.type === 'fold') say = L('fold');
         else if (a.type === 'raise') say = L('raise');
         else if (a.type === 'grab' && a.mult >= 3) say = L('grab');
@@ -154,7 +155,9 @@
         if (c && (c.type === 'bomb' || c.type === 'rocket') && rng() < 0.8) say = L('bomb');
         else if (obs.hand.length - a.cards.length <= 2 && obs.hand.length - a.cards.length > 0 && rng() < 0.6) say = L('alarm', { n: obs.hand.length - a.cards.length });
       }
-      if (game === 'mahjong' && a.type === 'hu') say = pick(rng, (LINES[lang] || LINES.en).hu.filter((x, i) => obs.phase === 'claim' ? i !== 1 : true));
+      // remember the lies so the table can expose them once the cards are shown
+      if (tell && say) (policy.tells = policy.tells || []).push({ kind: tell, said: say });
+      if (game === 'mahjong' && a.type === 'hu') say = pick(rng, (LINES[lg()] || LINES.en).hu.filter((x, i) => obs.phase === 'claim' ? i !== 1 : true));
       return say ? { ...a, say } : a;
     };
     // reactions to what happened (settle results, chat aimed at the table)
@@ -208,24 +211,30 @@
     const P = PERSONAS[personaId] || PERSONAS.hao;
     const fallback = scripted(game, personaId, { lang, rng });
     const rules = A.describe(game);
-    const system = [
-      `You are ${P.name[lang] || P.name.en}, a player at a virtual-chip casino table (no real money). Character: ${P.bio[lang] || P.bio.en}`,
-      `Game: ${rules.name.en} / ${rules.name.zh}. Rules: ${rules.rules}`,
-      rules.cards ? rules.cards : '', rules.tiles ? rules.tiles : '',
-      'You play to win chips. Table talk is part of the game: you may bluff, sandbag, needle, flatter or mislead other players with what you say, just like a real card shark. Never reveal your hidden cards honestly unless it helps you. Stay in character. Keep "say" short (under 25 words), in ' + (lang === 'zh' ? 'Chinese (casual, spoken)' : 'English') + ', or empty when silence is better.',
-      'Each turn you get your private observation as JSON (including `legal`: the only actions you may take, with their parameter ranges, and `chat`: what people said recently, including the human player "you"). Reply with ONLY a JSON object: {"think": "<one-line private reasoning>", "action": {"type": ..., ...params}, "say": "<optional table talk>"}.'
-    ].filter(Boolean).join('\n\n');
+    const system = () => {
+      const lng = typeof lang === 'function' ? lang() : lang;
+      return [
+        `You are ${P.name[lng] || P.name.en}, a player at a virtual-chip casino table (no real money). Character: ${P.bio[lng] || P.bio.en}`,
+        `Game: ${rules.name.en} / ${rules.name.zh}. Rules: ${rules.rules}`,
+        rules.cards || '', rules.tiles || '',
+        'You play to win chips. Table talk is part of the game: you may bluff, sandbag, needle, flatter or mislead other players with what you say, just like a real card shark. Never reveal your hidden cards honestly unless it helps you. Read the chat: the human player ("you") may be bluffing too. Stay in character. Keep "say" short (under 25 words), in ' + (lng === 'zh' ? 'Chinese (casual, spoken, like a real player at a 棋牌室 table)' : 'English') + ', or empty when silence is better. Talk on maybe one turn in three, not every turn.',
+        'Each turn you get your private observation as JSON (including `legal`: the only actions you may take, with their parameter ranges, and `chat`: what people said recently). Reply with ONLY a JSON object: {"think": "<one short line of private reasoning>", "action": {"type": ..., ...params}, "say": "<optional table talk>"}.'
+      ].filter(Boolean).join('\n\n');
+    };
     const policy = async obs => {
       const user = 'Observation:\n' + JSON.stringify(compactObs(obs));
       let messages = [{ role: 'user', content: user }];
       for (let attempt = 0; attempt < 2; attempt++) {
         try {
-          const text = await callModel(cfg, system, messages);
+          const text = await callModel(cfg, system(), messages);
           const j = parseJSON(text);
           const action = j.action || {};
           const err = E.validate(action, obs.legal);
           if (err) { messages = [...messages, { role: 'assistant', content: text }, { role: 'user', content: 'Illegal: ' + err + '. Pick from legal again, JSON only.' }]; continue; }
-          if (onThought && j.think) onThought(j.think);
+          if (j.think) {
+            policy.lastThought = String(j.think).slice(0, 200); if (onThought) onThought(policy.lastThought, obs);
+            (policy.tells = policy.tells || []).push({ kind: 'think', text: policy.lastThought, said: j.say ? String(j.say).slice(0, 160) : '' });
+          }
           return j.say ? { ...action, say: String(j.say).slice(0, 160) } : action;
         } catch (err) { if (attempt === 1 || /HTTP 4/.test(err.message)) { policy.lastError = err.message; break; } }
       }
@@ -235,9 +244,9 @@
     policy.react = (ev, me) => fallback.react(ev, me);
     policy.reply = async (obs, chatEvent) => {
       try {
-        const text = await callModel(cfg, system, [{ role: 'user', content: 'Observation:\n' + JSON.stringify(compactObs(obs)) + `\n\n"${chatEvent.seat}" just said: "${chatEvent.text}". Answer in character, or stay silent. Reply JSON only: {"say": "..."}` }], 150);
+        const text = await callModel(cfg, system(), [{ role: 'user', content: 'Observation:\n' + JSON.stringify(compactObs(obs)) + `\n\n"${chatEvent.seat}" just said: "${chatEvent.text}". Answer in character, or stay silent. Reply JSON only: {"say": "..."}` }], 150);
         return parseJSON(text).say || null;
-      } catch (err) { policy.lastError = err.message; return fallback.react(chatEvent, me => me); }
+      } catch (err) { policy.lastError = err.message; return fallback.react(chatEvent, obs.seat); }
     };
     policy.persona = personaId; policy.kind = 'llm';
     return policy;
