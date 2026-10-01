@@ -96,6 +96,7 @@
           <p class="eyebrow" data-i18n="lobby.eyebrow">${t('lobby.eyebrow')}</p>
           <h1 class="hero-title"><span data-i18n="brand">${t('brand')}</span></h1>
           <p class="hero-sub" data-i18n="lobby.sub">${t('lobby.sub')}</p>
+          <button class="btn btn-ghost academy-btn">${C.icon('info')}<span data-i18n="lobby.academy">${t('lobby.academy')}</span></button>
           <div class="hero-stats">
             <div><span data-i18n="stat.biggest">${t('stat.biggest')}</span><b class="st-big">0</b></div>
             <div><span data-i18n="stat.rounds">${t('stat.rounds')}</span><b class="st-rounds">0</b></div>
@@ -126,6 +127,7 @@
       </div>`).join('')}
       <p class="disclaimer" data-i18n="lobby.disclaimer">${t('lobby.disclaimer')}</p>`;
     root.querySelector('.bonus-btn').onclick = () => openWheel();
+    root.querySelector('.academy-btn').onclick = () => { Sound.fx.click(); Tutor.academy(); };
     U.$$('.tile', root).forEach(a => {
       a.addEventListener('pointerenter', () => Sound.fx.hover());
       a.addEventListener('click', () => Sound.fx.click());
@@ -224,6 +226,7 @@
       ${row('set-music', 'set.music', st.music)}
       ${row('set-voice', 'set.voice', st.voice)}
       <div class="set-row"><span>${t('set.lang')}</span><div class="seg"><button class="seg-btn ${I18N.lang === 'zh' ? 'on' : ''}" data-l="zh">中文</button><button class="seg-btn ${I18N.lang === 'en' ? 'on' : ''}" data-l="en">English</button></div></div>
+      <div class="set-row"><span>${t('lobby.academy')}</span><button class="btn btn-ghost btn-sm set-aca">${t('aca.open')}</button></div>
       <div class="set-row"><span>${t('set.ai')} <small class="ai-on-lab">${Casino.ai.on() ? '· ON' : ''}</small></span><button class="btn btn-ghost btn-sm set-ai">${t('set.aiOpen')}</button></div>
       <h3>${t('set.stats')}</h3>
       <dl class="stats-grid">
@@ -242,6 +245,7 @@
     body.querySelector('#set-voice').onchange = e => { Sound.setVoice(e.target.checked); if (e.target.checked) Sound.say(t('set.voiceOn')); };
     U.$$('[data-l]', body).forEach(b => b.onclick = () => { setLang(b.dataset.l); close(); openSettings(); });
     body.querySelector('.set-ai').onclick = () => { close(); openAI(); };
+    body.querySelector('.set-aca').onclick = () => { close(); Tutor.academy(); };
     const reset = body.querySelector('.set-reset');
     reset.onclick = () => {
       if (!reset.classList.contains('confirm')) { reset.classList.add('confirm'); reset.textContent = t('set.resetConfirm'); Sound.fx.error(); return; }

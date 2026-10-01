@@ -1,0 +1,100 @@
+/* Tutorial: spotlight coach marks, Casino 101 academy, blackjack coach */
+
+.tut-ov { position: fixed; inset: 0; z-index: 900; animation: tutIn .25s ease both; }
+.tut-ov.out { animation: tutOut .2s ease both; }
+@keyframes tutIn { from { opacity: 0; } }
+@keyframes tutOut { to { opacity: 0; } }
+
+/* the hole is a box whose giant shadow dims everything else */
+.tut-hole {
+  position: fixed; border-radius: 14px; pointer-events: auto;
+  box-shadow: 0 0 0 9999px rgba(2, 8, 6, .76), 0 0 0 2px var(--brass-hi), 0 0 28px 4px rgba(246, 201, 78, .45);
+  transition: left .35s cubic-bezier(.2, .8, .2, 1), top .35s cubic-bezier(.2, .8, .2, 1), width .35s cubic-bezier(.2, .8, .2, 1), height .35s cubic-bezier(.2, .8, .2, 1);
+  animation: tutRing 1.8s ease-in-out infinite;
+}
+.tut-hole.none { box-shadow: 0 0 0 9999px rgba(2, 8, 6, .8); animation: none; }
+@keyframes tutRing { 50% { box-shadow: 0 0 0 9999px rgba(2, 8, 6, .76), 0 0 0 3px var(--brass-pale), 0 0 44px 10px rgba(246, 201, 78, .6); } }
+
+.tut-card {
+  position: fixed; width: min(360px, calc(100vw - 32px)); padding: 14px 16px 12px;
+  background: linear-gradient(170deg, #1b130a, #0c0805 70%); color: var(--ivory);
+  border: 1px solid var(--brass); border-radius: 16px;
+  box-shadow: var(--shadow), 0 0 0 4px rgba(217, 164, 65, .12), inset 0 1px 0 rgba(255, 243, 192, .15);
+  transition: left .35s cubic-bezier(.2, .8, .2, 1), top .35s cubic-bezier(.2, .8, .2, 1);
+}
+.tut-card.in { animation: tutCard .32s cubic-bezier(.2, 1.3, .4, 1) both; }
+.tut-card.nudge { animation: shakeX .35s ease; }
+@keyframes tutCard { from { opacity: 0; transform: translateY(8px) scale(.96); } }
+.tut-card h3 { margin: 8px 0 4px; font-family: var(--f-zh); font-weight: 400; font-size: 21px; color: var(--brass-hi); letter-spacing: .02em; }
+.tut-card p { margin: 0; font-size: 15px; line-height: 1.55; color: #e9dfc6; }
+.tut-card p b { color: var(--brass-pale); }
+.tut-who { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--muted); letter-spacing: .04em; }
+.tut-n { margin-left: auto; font-variant-numeric: tabular-nums; }
+.tut-av {
+  display: inline-grid; place-items: center; flex: none; width: 30px; height: 30px; border-radius: 50%;
+  font-family: var(--f-zh); font-size: 17px; color: #2a1a05;
+  background: radial-gradient(circle at 35% 30%, #fff3c0, #f6c94e 45%, #a86f1c);
+  box-shadow: 0 0 0 2px #2a1a05, 0 0 0 3px var(--brass), 0 0 14px rgba(246, 201, 78, .5);
+}
+.tut-av.sm { width: 24px; height: 24px; font-size: 14px; }
+.tut-btns { display: flex; align-items: center; gap: 8px; margin-top: 12px; }
+.tut-btns .tut-skip { margin-right: auto; }
+.tut-dots { display: flex; gap: 4px; margin-right: 4px; }
+.tut-dots i { width: 6px; height: 6px; border-radius: 50%; background: rgba(217, 164, 65, .3); }
+.tut-dots i.on { background: var(--brass-hi); box-shadow: 0 0 6px var(--brass-hi); }
+.tut-prev { min-width: 36px; font-size: 20px; line-height: 1; }
+.tut-final { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.tut-final .btn { flex: 1 1 calc(50% - 4px); }
+
+/* lobby entry */
+.academy-btn { margin-top: 14px; gap: 8px; }
+.academy-btn svg { width: 18px; height: 18px; }
+
+/* Casino 101 */
+.aca-tabs { display: flex; width: 100%; margin-bottom: 14px; }
+.aca-tabs .seg-btn { flex: 1; }
+.aca .rules table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 14px; }
+.aca .rules th, .aca .rules td { padding: 7px 8px; border-bottom: 1px solid var(--line-soft); text-align: left; vertical-align: top; }
+.aca .rules th { color: var(--brass-hi); font-weight: 600; }
+.aca .rules td:first-child { white-space: nowrap; color: var(--ivory); }
+.aca .rules ol, .aca .rules ul { padding-left: 1.3em; }
+.aca .rules li { margin: 6px 0; }
+.aca-start { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line-soft); }
+.aca-start .aca-coach { flex: 1 1 240px; margin: 0; }
+.aca-games { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
+.aca-game { padding: 12px 12px 10px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255, 255, 255, .03); display: flex; flex-direction: column; }
+.aca-game p { margin: 6px 0 10px; font-size: 14px; color: var(--muted); line-height: 1.45; flex: 1; }
+.aca-g-head { display: flex; align-items: baseline; gap: 8px; }
+.aca-g-head b { font-size: 17px; color: var(--ivory); }
+.aca-lv { margin-left: auto; color: var(--brass-hi); letter-spacing: 1px; font-size: 13px; }
+.aca-lv i { font-style: normal; color: rgba(217, 164, 65, .22); }
+.aca-g-btns { display: flex; gap: 8px; }
+
+/* blackjack coach */
+.coach-line {
+  display: flex; align-items: center; gap: 8px; max-width: 640px; margin: 0 auto 8px; padding: 6px 12px 6px 6px;
+  border: 1px solid var(--line); border-radius: 999px; background: rgba(3, 14, 10, .7);
+  font-size: 14px; color: #e9dfc6; transition: opacity .2s;
+}
+.coach-line.dim { opacity: .45; }
+.coach-line b { color: var(--brass-hi); margin-right: 4px; }
+.btn.coach { position: relative; box-shadow: 0 0 0 2px var(--brass-hi), 0 0 22px rgba(246, 201, 78, .55); animation: coachGlow 1.4s ease-in-out infinite; }
+.btn.coach::after {
+  content: '★'; position: absolute; top: -9px; right: -7px; width: 18px; height: 18px; border-radius: 50%;
+  display: grid; place-items: center; font-size: 11px; color: #2a1a05; background: var(--brass-hi);
+}
+@keyframes coachGlow { 50% { box-shadow: 0 0 0 2px var(--brass-pale), 0 0 34px rgba(246, 201, 78, .8); } }
+
+@media (max-width: 640px) {
+  .tut-card { padding: 12px 14px 10px; }
+  .tut-card h3 { font-size: 19px; }
+  .tut-card p { font-size: 14px; }
+  .coach-line { font-size: 13px; border-radius: 14px; }
+  .aca .rules td:first-child { white-space: normal; }
+  .aca-tabs .seg-btn { padding-left: 4px; padding-right: 4px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tut-ov, .tut-card.in, .tut-card.nudge, .tut-hole, .btn.coach { animation: none; }
+  .tut-hole, .tut-card { transition: none; }
+}

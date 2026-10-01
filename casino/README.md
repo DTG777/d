@@ -61,12 +61,22 @@ js/core.js          钱包、等级、筹码/下注板/扑克牌组件、路由
 js/engine/*.js      纯规则引擎（无 DOM）：每个游戏的 init/legal/step/view，AI 工具，性格化对手 Brain
 js/casino-api.js    window.Casino：画面与 AI 共用的实时接口
 js/games/*.js       各游戏画面
+js/tutorial.js      新手引导、新手学堂、21点教练
 js/main.js          大厅、幸运转盘、设置、启动
 docs/AGENT_API.md   AI 接入文档 / how agents and language models join the tables
 tools/llm-agent.js  命令行里让大模型上桌：node tools/llm-agent.js table zhajinhua
 tools/sim.js        老虎机与弹珠台的 RTP 模拟：node tools/sim.js
 tools/i18n-check.js 校验两种语言的文案键是否齐全
 ```
+
+## 新手 / Beginners
+
+- 第一次打开时，荷官「小金」会带你逛大厅；每个游戏第一次进去，都有聚光灯式的分步讲解。
+  On your first visit, Jin the croupier shows you around the lobby, and each game gets a spotlight walkthrough the first time you open it.
+- **新手学堂**（大厅按钮或设置里）包含：入门须知、按难度排好的游戏和「带我玩」按钮、赔率与返还率、牌桌黑话。
+  **Casino 101** (lobby button or Settings) covers the basics, games sorted by difficulty with a "Teach me" button, odds and RTP, and table slang.
+- 21点里，小金会按基本策略点亮推荐按钮并说明理由，可在学堂里关闭。
+  In blackjack, Jin lights up the basic-strategy move and explains why. You can turn this off in Casino 101.
 
 ## AI 对手 / AI opponents
 

@@ -6,14 +6,16 @@ global.document = { documentElement: {} };
 global.window = global;
 require('../js/i18n.js');
 require('../js/i18n-more.js');
+require('../js/i18n-tut.js');
 const D = I18N._dict;
-const files = ['js/core.js', 'js/fx.js', 'js/main.js', ...fs.readdirSync(path.join(__dirname, '../js/games')).map(f => 'js/games/' + f)];
+const files = ['js/core.js', 'js/fx.js', 'js/main.js', 'js/tutorial.js', ...fs.readdirSync(path.join(__dirname, '../js/games')).map(f => 'js/games/' + f)];
 const keys = new Set();
 for (const f of files) {
   const src = fs.readFileSync(path.join(__dirname, '..', f), 'utf8');
   for (const m of src.matchAll(/(?:\bt|I18N\.t)\(\s*'([\w.]+)'/g)) keys.add(m[1]);
   for (const m of src.matchAll(/data-i18n(?:-aria)?="([\w.]+)"/g)) keys.add(m[1]);
   for (const m of src.matchAll(/key: '([\w.]+)'/g)) if (m[1].includes('.')) keys.add(m[1]);
+  for (const m of src.matchAll(/'((?:tut|aca|bjc)\.[\w.]+)'/g)) keys.add(m[1]);
 }
 // dynamic keys
 ['slots', 'blackjack', 'roulette', 'baccarat', 'sicbo', 'crash', 'plinko', 'zhajinhua', 'niuniu', 'doudizhu', 'mahjong'].forEach(g => { keys.add('game.' + g); keys.add('tag.' + g); });
@@ -24,6 +26,10 @@ for (const f of files) {
 ['cardroom', 'slots', 'tables', 'instant'].forEach(s => { keys.add('lobby.' + s); keys.add('lobby.' + s + 'Sub'); });
 ['high', 'pair', 'straight', 'flush', 'sflush', 'trips'].forEach(s => keys.add('zj.' + s));
 for (let i = 1; i <= 8; i++) keys.add('pv.q' + i);
+['start', 'games', 'odds', 'words'].forEach(k => keys.add('aca.tab.' + k));
+['start', 'odds', 'words'].forEach(k => keys.add('aca.' + k));
+['slots', 'blackjack', 'roulette', 'baccarat', 'sicbo', 'crash', 'plinko', 'zhajinhua', 'niuniu', 'doudizhu', 'mahjong'].forEach(g => keys.add('aca.g.' + g));
+['hit', 'stand', 'double', 'split'].forEach(a => keys.add('bj.' + a));
 const EN = require('../js/engine/core.js'); require('../js/engine/ddz.js'); require('../js/engine/mahjong.js');
 Object.keys(EN.list.mahjong.FAN_NAME).forEach(f => keys.add('mj.f.' + f));
 for (const m of fs.readFileSync(path.join(__dirname, '../js/engine/ddz.js'), 'utf8').matchAll(/type: '(\w+)'/g)) if (!['play', 'pass', 'bid', 'start'].includes(m[1])) keys.add('dz.c.' + m[1]);
